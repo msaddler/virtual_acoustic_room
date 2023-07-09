@@ -275,7 +275,7 @@ nfreq = freq/fs;								% freq as fraction of fs
 %Old code read: ht = wavread(deblank(meas_files(1,:)));
 %wavread depreciated --> audioread, also changed to deal with path
 %backslash for unix(AFF 07/2017)
-ht = audioread(strrep(deblank(meas_files{1}),'\',filesep));
+ht = audioread(strrep(deblank(meas_files(1,:)),'\',filesep));
 %  ht = wavread(deblank(eval(meas_files(1,:))));
  h = zeros(taps+ctap+ctap2+length(ht(:,1)),num_rec);
 

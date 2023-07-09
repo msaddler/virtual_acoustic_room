@@ -223,7 +223,7 @@ numColsInB = size(hrtf_temp,2);
    	    	% add into overall impulse response matrix
       	 	%hrtf = wavread(deblank(m_files(l,:)));
             %wavread depreciated--> audioread
-            hrtf = audioread(strrep(deblank(m_files(l,:)),'\',filesep));
+            hrtf = audioread(strrep(deblank(m_files{l}),'\',filesep));
    	 		%h(:,1)=h(:,1)+fftfilt(hrtf(:,1),ht(1:length(h(:,1)))); 
    	 		%h(:,2)=h(:,2)+fftfilt(hrtf(:,2),ht(1:length(h(:,1))));
             %following code added to enable parallelization
@@ -278,7 +278,7 @@ numColsInB = size(hrtf_temp,2);
        		% add into overall impulse response matrix
             %hrtf = wavread(deblank(m_files(l,:)));
             %wavread depreciated --> audioread
-            hrtf = audioread(strrep(deblank(m_files(l,:)),'\',filesep));
+            hrtf = audioread(strrep(deblank(m_files{l}),'\',filesep));
             % hrtf = wavread(deblank(eval(m_files(l,:))));
    	 		%h(:,1)=h(:,1)+fftfilt(hrtf(:,2),ht(1:length(h(:,1)))); 
    	 		%h(:,2)=h(:,2)+fftfilt(hrtf(:,1),ht(1:length(h(:,1))));

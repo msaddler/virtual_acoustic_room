@@ -75,8 +75,8 @@ function hout = shapedfilter_hrtf(sdelay, freq, gain, fs, ctap, ctap2);
         gt = real(ifft(G.')); % IFFT to get imp-resp
 
         g = [0.5 * gt(ctap2, :); gt(ctap2 + 1:2 * ctap2 - 2, :); ...
-               gt(1:ctap2 - 1, :); 0.5 * gt(ctap2, :); ...
-               zeros(2 * ctap - 2, length(gt(1, :)))];
+                 gt(1:ctap2 - 1, :); 0.5 * gt(ctap2, :); ...
+                 zeros(2 * ctap - 2, length(gt(1, :)))];
         G = fft(g); % Zero-pad and FFT
 
         H = fft([h.'; zeros(2 * ctap2 - 2, length(h(:, 1)))]);

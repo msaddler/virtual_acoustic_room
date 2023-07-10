@@ -118,6 +118,7 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
              dur=0.5,
              kwargs_room_impulse_hrtf={},
              incorporate_lead_zeros=True,
+             allow_negative_lead_zeros=False,
              verbose=True,
              eng=None):
     """
@@ -139,7 +140,7 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
     assert is_valid_position(head_pos_xyz, room_dim_xyz, buffer=buffer_pos), "Invalid head position"
     assert is_valid_position(src_pos_xyz, room_dim_xyz, buffer=buffer_pos), "Invalid source position"
     if verbose:
-        print("Running room simulator: head_pos={}, src_pos={}, room_dim={}".format(
+        print("[room simulator] head_pos: {}, src_pos: {}, room_dim: {}".format(
             head_pos_xyz.tolist(),
             src_pos_xyz.tolist(),
             room_dim_xyz.tolist()))
@@ -155,15 +156,112 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
         **kwargs_room_impulse_hrtf,
         eng=eng)
     if verbose:
-        print(f'Ran room simulator in {time.time() - t0} seconds')
+        print(f'[room simulator] time elapsed: {time.time() - t0} seconds')
     if incorporate_lead_zeros:
         lead_zeros = int(np.round(lead_zeros))
+        print(f'[room simulator] incorporated {lead_zeros} leading zeros')
         if lead_zeros >= 0:
             h_out = np.pad(h_out, ((lead_zeros, 0), (0, 0)))
             brir = h_out[:int(dur * sr)]
         else:
             h_out = np.pad(h_out, ((0, -lead_zeros), (0, 0)))
-            brir = h_out[lead_zeros:]
+            brir = h_out[-lead_zeros:]
     else:
         brir = h_out
     return brir
+
+
+def sample_room_parameters(
+        p_outdoor=0.25,
+        p_outdoor_wall=0.25,
+        range_room_x=[3, 30],
+        range_room_y=[3, 30],
+        range_room_z=[2.5, 10],
+        list_material_outdoor_floor=[1, 7, 23, 24, 25],
+        list_material_outdoor_wall=[1, 2, 3, 4, 5, 6, 7, 23, 24],
+        list_material_indoor_floor=[1, 2, 4, 6, 12, 13, 14, 15],
+        list_material_indoor_wall=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        list_material_indoor_ceiling=[3, 6, 16, 17, 18, 19, 20],
+        list_n_unique_wall_materials=[1, 2, 3, 4],
+        verbose=True):
+    """
+    Helper function for randomly sampling room parameters (dimensions and materials).
+    """
+    ANECHOIC = 26
+    is_outdoor = np.random.choice([1, 0], p=[p_outdoor, 1-p_outdoor])
+    x_len = np.exp(np.random.uniform(low=np.log(range_room_x[0]), high=np.log(range_room_x[1]), size=None))
+    y_len = np.exp(np.random.uniform(low=np.log(range_room_y[0]), high=np.log(range_room_y[1]), size=None))
+    z_len = np.exp(np.random.uniform(low=np.log(range_room_z[0]), high=np.log(range_room_z[1]), size=None))
+    if is_outdoor:
+        material_floor = np.random.choice(list_material_outdoor_floor)
+        material_ceiling = np.random.choice([ANECHOIC])
+        material_wall = np.random.choice(
+            [-1, ANECHOIC],
+            size=4,
+            replace=True,
+            p=[p_outdoor_wall, 1-p_outdoor_wall])
+        IDX_outdoor_wall = material_wall < 0
+        material_wall[IDX_outdoor_wall] = np.random.choice(
+            list_material_outdoor_wall,
+            size=IDX_outdoor_wall.sum(),
+            replace=True)
+    else:
+        material_floor = np.random.choice(list_material_indoor_floor)
+        material_ceiling = np.random.choice(list_material_indoor_ceiling)
+        n_unique_wall_materials = np.random.choice(list_n_unique_wall_materials)
+        material_wall = np.random.choice(
+            list_material_indoor_wall,
+            size=n_unique_wall_materials,
+            replace=False)
+        if len(material_wall < 4):
+            material_wall = np.concatenate([
+                material_wall,
+                np.random.choice(material_wall, size=4-len(material_wall), replace=True),
+            ])
+    room_parameters = {
+        'room_materials': list(material_wall) + [material_floor, material_ceiling],
+        'room_dim_xyz': [x_len, y_len, z_len],
+        'is_outdoor': is_outdoor,
+        'material_wall_xmin': map_int_to_material[material_wall[0]],
+        'material_wall_xmax': map_int_to_material[material_wall[1]],
+        'material_wall_ymin': map_int_to_material[material_wall[2]],
+        'material_wall_ymax': map_int_to_material[material_wall[3]],
+        'material_wall_zmin': map_int_to_material[material_floor],
+        'material_wall_zmax': map_int_to_material[material_ceiling],
+    }
+    if verbose:
+        print(f"Sampled room")
+        for k in room_parameters.keys():
+            print(f"|__ {k}: {room_parameters[k]}")
+    return room_parameters
+ 
+
+def sample_head_parameters(
+        room_dim_xyz=[10, 10, 3],
+        buffer_pos=1.4,
+        range_src_elev=[-60, 60],
+        range_head_azim=[0, 90],
+        range_head_z=[1.2, 2.4],
+        verbose=True):
+    """
+    Helper function for randomly sampling head parameters (position and azimuth).
+    """
+    min_z = buffer_pos * np.sin(np.deg2rad(np.max(np.abs(range_src_elev))))
+    min_z = max(range_head_z[0], min_z)
+    max_z = min(range_head_z[1], room_dim_xyz[2] - min_z)
+    assert (min_z <= max_z) and (min_z >= 0), "Invalid range_head_z"
+    head_pos_xyz = np.array([
+        np.random.uniform(low=buffer_pos, high=room_dim_xyz[0]-buffer_pos),
+        np.random.uniform(low=buffer_pos, high=room_dim_xyz[1]-buffer_pos),
+        np.random.uniform(low=min_z, high=max_z),
+    ])
+    head_azim = np.random.uniform(low=range_head_azim[0], high=range_head_azim[1])
+    head_parameters = {
+        'head_pos_xyz': head_pos_xyz,
+        'head_azim': head_azim,
+    }
+    if verbose:
+        print(f"Sampled head position (head_z sampled uniformly from {[min_z, max_z]})")
+        for k in head_parameters.keys():
+            print(f"|__ {k}: {head_parameters[k]}")
+    return head_parameters

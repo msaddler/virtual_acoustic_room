@@ -268,3 +268,38 @@ def sample_head_parameters(
         for k in head_parameters.keys():
             print(f"|__ {k}: {head_parameters[k]}")
     return head_parameters
+
+
+def distance_to_wall(room_dim_xyz, head_pos_xyz, head_azim, src_azim, src_elev):
+    """
+    Helper function to find maximum possible source distance given room dimensions,
+    head position, head azimuth, source azimuth (relative to head), and source
+    elevation (relative to head).
+    """
+    azim = head_azim + src_azim
+    elev = src_elev
+    while azim < 0:
+        azim += 360
+    azim = azim % 360
+    quadrant = int(azim / 90) + 1
+    if quadrant == 1:
+        rx = (room_dim_xyz[0] - head_pos_xyz[0]) / (np.cos(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+        ry = (room_dim_xyz[1] - head_pos_xyz[1]) / (np.sin(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+    elif quadrant == 2:
+        rx = -head_pos_xyz[0] / (np.cos(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+        ry = (room_dim_xyz[1] - head_pos_xyz[1]) / (np.sin(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+    elif quadrant == 3:
+        rx = -head_pos_xyz[0] / (np.cos(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+        ry = -head_pos_xyz[1] / (np.sin(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+    elif quadrant == 4:
+        rx = (room_dim_xyz[0] - head_pos_xyz[0]) / (np.cos(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+        ry = -head_pos_xyz[1] / (np.sin(np.deg2rad(azim)) * np.cos(np.deg2rad(elev)))
+    else:
+        raise ValueError('INVALID ANGLE')
+    if elev > 0:
+        rz = (room_dim_xyz[2] - head_pos_xyz[2]) / np.sin(np.deg2rad(elev))
+    elif elev < 0:
+        rz = -head_pos_xyz[2] / np.sin(np.deg2rad(elev))
+    else:
+        rz = np.inf
+    return min(rx, ry, rz)

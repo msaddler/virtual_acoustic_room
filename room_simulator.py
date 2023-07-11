@@ -121,7 +121,6 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
              dur=0.5,
              kwargs_room_impulse_hrtf={},
              incorporate_lead_zeros=True,
-             allow_negative_lead_zeros=False,
              verbose=True,
              eng=None):
     """

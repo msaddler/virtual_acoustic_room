@@ -133,12 +133,22 @@ def impulse_generate_hrtf(
         h_az,
         s_locations,
         s_reflects,
-        L,
         m_locs,
         m_locs_xyz,
         m_locs_xyz_logdist,
-        m_files, m_delay, m_sym, sr, c, ntaps, log_dist,
-        ctap, ctap2, fgains, nfreq, lead_zeros, jitter):
+        m_files,
+        m_delay,
+        m_sym,
+        sr,
+        c,
+        ntaps,
+        log_dist,
+        ctap,
+        ctap2,
+        fgains,
+        nfreq,
+        lead_zeros,
+        jitter):
     """
     """
     jitter_reflects = 5
@@ -204,8 +214,8 @@ def impulse_generate_hrtf(
     response from corresponding sources to meas loc.  Then
     incorporate HRTFs.  Treat flips and no flips accordingly.
     """
-    hrtf_temp = np.zeros((L, *h.shape), dtype=float)
-    for l in range(L):
+    hrtf_temp = np.zeros((m_locs.shape[0], *h.shape), dtype=float)
+    for l in range(hrtf_temp.shape[0]):
         IDX_l = near_m_loc == l
         if IDX_l.sum() > 0:
             IDX_noflip = np.logical_and(IDX_l, ~flip)
@@ -255,7 +265,7 @@ def impulse_generate_hrtf(
                         scipy.signal.fftconvolve(ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
                         scipy.signal.fftconvolve(ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
                     ], axis=1)
-                    hrtf_temp[l, :, :] = hrtf_temp[l, :, :] + new_vals[:hrtf_temp.shape[1]];
+                    hrtf_temp[l, :, :] = hrtf_temp[l, :, :] + new_vals[:hrtf_temp.shape[1]]
 
             # Treat flipped sources
             if IDX_flip.sum() > 0:
@@ -299,7 +309,7 @@ def impulse_generate_hrtf(
                         scipy.signal.fftconvolve(ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
                         scipy.signal.fftconvolve(ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
                     ], axis=1)
-                    hrtf_temp[l, :, :] = hrtf_temp[l, :, :] + new_vals[:hrtf_temp.shape[1]];
+                    hrtf_temp[l, :, :] = hrtf_temp[l, :, :] + new_vals[:hrtf_temp.shape[1]]
 
     h = h + hrtf_temp.sum(axis=0)
     return h, s_locations
@@ -328,8 +338,7 @@ def room_impulse_hrtf(
     h_az = np.array(head_azimuth, dtype=float)
     m_locs = np.array(meas_locs, dtype=float)
     m_files = meas_files
-    L = meas_locs.shape[0]
-    m_delay = (np.sqrt(np.sum(np.square(src - h_cent))) / c) * np.ones((L,))
+    m_delay = (np.sqrt(np.sum(np.square(src - h_cent))) / c) * np.ones((meas_locs.shape[0],))
     m_sym = meas_sym
 
     # Frequency-dependent reflection coefficients for each wall
@@ -355,15 +364,17 @@ def room_impulse_hrtf(
     
     # Convert measured HRTF locations into room (xyz) coordinates (and log distance locations)
     m_locs_xyz = np.ones_like(m_locs)
-    m_locs_xyz[:, 0] = m_locs[:, 0] * np.cos(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz[:, 1] = m_locs[:, 0] * -np.sin(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz[:, 2] = m_locs[:, 0] * np.sin(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz = m_locs_xyz + h_cent.reshape([1, -1]);
+    r = m_locs[:, 0]
+    m_locs_xyz[:, 0] = r * np.cos(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz[:, 1] = r * -np.sin(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz[:, 2] = r * np.sin(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz = m_locs_xyz + h_cent.reshape([1, -1])
     m_locs_xyz_logdist = np.ones_like(m_locs)
-    m_locs_xyz_logdist[:, 0] = (np.log(m_locs[:, 0]) - np.log(0.05)) * np.cos(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist[:, 1] = (np.log(m_locs[:, 0]) - np.log(0.05)) * -np.sin(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist[:, 2] = (np.log(m_locs[:, 0]) - np.log(0.05)) * np.sin(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist = m_locs_xyz_logdist + h_cent.reshape((1, -1));
+    r = (np.log(m_locs[:, 0]) - np.log(0.05))
+    m_locs_xyz_logdist[:, 0] = r * np.cos(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz_logdist[:, 1] = r * -np.sin(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz_logdist[:, 2] = r * np.sin(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz_logdist = m_locs_xyz_logdist + h_cent.reshape((1, -1))
     
     # Calculate the number of lead zeros to strip
     idx_min = np.argmin(np.sqrt(np.sum(np.square(src.reshape((1, -1)) - m_locs_xyz), axis=1)))
@@ -456,12 +467,22 @@ def room_impulse_hrtf(
                     h_az,
                     s_locations,
                     s_reflects,
-                    L,
                     m_locs,
                     m_locs_xyz,
                     m_locs_xyz_logdist,
-                    m_files, m_delay, m_sym, sr, c, ntaps, log_dist,
-                    ctap, ctap2, fgains, nfreq, lead_zeros, jitter)
+                    m_files,
+                    m_delay,
+                    m_sym,
+                    sr,
+                    c,
+                    ntaps,
+                    log_dist,
+                    ctap,
+                    ctap2,
+                    fgains,
+                    nfreq,
+                    lead_zeros,
+                    jitter)
                 loc_num = 0 # Reset loc_num counter and continue
                 s_locs = s_locs[slice(m, s_locs.shape[0]), :]
                 s_refls = s_refls[slice(m, s_refls.shape[0]), :]
@@ -480,12 +501,22 @@ def room_impulse_hrtf(
         h_az,
         s_locations,
         s_reflects,
-        L,
         m_locs,
         m_locs_xyz,
         m_locs_xyz_logdist,
-        m_files, m_delay, m_sym, sr, c, ntaps, log_dist,
-        ctap, ctap2, fgains, nfreq, lead_zeros, jitter)
+        m_files,
+        m_delay,
+        m_sym,
+        sr,
+        c,
+        ntaps,
+        log_dist,
+        ctap,
+        ctap2,
+        fgains,
+        nfreq,
+        lead_zeros,
+        jitter)
     
     """
     Part III: Finalize output

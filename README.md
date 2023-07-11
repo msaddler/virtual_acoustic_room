@@ -1,6 +1,6 @@
 ## francl_mcdermott_room_simulator
 
-Python interface for using a MATLAB-based virtual acoustic room simulator by Mike O'Connel and Jay Desloge.
+Python interface for using a MATLAB-based virtual acoustic room simulator by Mike O'Connell and Jay Desloge.
 
 Conda environment containing the MATLAB engine for Python: `/om2/user/msaddler/.conda/envs/matlab`.
 

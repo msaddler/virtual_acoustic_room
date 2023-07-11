@@ -8,7 +8,7 @@ import matlab.engine
 
 """
 The MATLAB function `acoeff_hrtf.m` maps materials to acoustic absorption coefficients.
-This dictionary maps integers to materials for which coefficients are available.
+This dictionary maps integer codes to materials for which coefficients are available.
 """
 map_int_to_material = {
     # WALLS
@@ -68,6 +68,9 @@ def room_impulse_hrtf(
         eng=None):
     """
     Python wrapper function around MATLAB function `room_impulse_hrtf.m`.
+    
+    TODO:   `meas_locs` and `meas_files` are hard-coded here, which currently
+            limits this room simulator to use a single set of measured HRTFs.
     """
     meas_locs = eng.load('HRTFs/data_locs.mat')['locs_gardnermartin']
     meas_files = eng.cellstr(scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file'].tolist())
@@ -230,11 +233,11 @@ def sample_room_parameters(
         'material_wall_zmax': map_int_to_material[material_ceiling],
     }
     if verbose:
-        print(f"Sampled room")
+        print(f"[sample_room_parameters]")
         for k in room_parameters.keys():
             print(f"|__ {k}: {room_parameters[k]}")
     return room_parameters
- 
+
 
 def sample_head_parameters(
         room_dim_xyz=[10, 10, 3],
@@ -249,7 +252,7 @@ def sample_head_parameters(
     min_z = buffer_pos * np.sin(np.deg2rad(np.max(np.abs(range_src_elev))))
     min_z = max(range_head_z[0], min_z)
     max_z = min(range_head_z[1], room_dim_xyz[2] - min_z)
-    assert (min_z <= max_z) and (min_z >= 0), "Invalid range_head_z"
+    assert (min_z <= max_z) and (min_z >= 0), "invalid range of z values for head position"
     head_pos_xyz = np.array([
         np.random.uniform(low=buffer_pos, high=room_dim_xyz[0]-buffer_pos),
         np.random.uniform(low=buffer_pos, high=room_dim_xyz[1]-buffer_pos),
@@ -261,7 +264,7 @@ def sample_head_parameters(
         'head_azim': head_azim,
     }
     if verbose:
-        print(f"Sampled head position (head_z sampled uniformly from {[min_z, max_z]})")
+        print(f"[sample_head_parameters] (head_z sampled uniformly from {[min_z, max_z]})")
         for k in head_parameters.keys():
             print(f"|__ {k}: {head_parameters[k]}")
     return head_parameters

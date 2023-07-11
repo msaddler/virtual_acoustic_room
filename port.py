@@ -3,6 +3,7 @@ import sys
 import pdb
 import numpy as np
 import soundfile as sf
+import scipy.signal
 import scipy.interpolate
 
 
@@ -161,8 +162,8 @@ def impulse_generate_hrtf(
         s_locations_pol[:, 1] = np.abs(s_locations_pol[:, 1])
         r = s_locations_pol[:, 0]
         s_locations = np.stack([
-            r * np.cos(np.deg2rad(s_locations_pol[:, 1])) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
-            r * -np.sin(np.deg2rad(s_locations_pol[:, 1])) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * np.cos(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * -np.sin(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
             r * np.sin(np.deg2rad(s_locations_pol[:, 2])),
         ], axis=1)
         s_locations = s_locations + h_cent.reshape((1, -1))
@@ -173,8 +174,8 @@ def impulse_generate_hrtf(
     if log_dist:
         r = np.log(s_locations_pol[:, 0]) - np.log(0.05)
         s_locations_logdist = np.stack([
-            r * np.cos(np.deg2rad(s_locations_pol[:, 1])) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
-            r * -np.sin(np.deg2rad(s_locations_pol[:, 1])) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * np.cos(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * -np.sin(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
             r * np.sin(np.deg2rad(s_locations_pol[:, 2])),
         ], axis=1)
         s_locations_logdist = s_locations_logdist + h_cent.reshape((1, -1))
@@ -204,7 +205,6 @@ def impulse_generate_hrtf(
     incorporate HRTFs.  Treat flips and no flips accordingly.
     """
     hrtf_temp = np.zeros((L, *h.shape), dtype=float)
-    
     for l in range(L):
         IDX_l = near_m_loc == l
         if IDX_l.sum() > 0:
@@ -393,7 +393,6 @@ def room_impulse_hrtf(
     4. Generate corresponding number of reflections from each wall
         for each source image.
     """
-    
     # Maximum source distance to be in impulse response
     dmax = np.ceil((ntaps + lead_zeros) * c / sr + np.max(walls))
     s_locations = np.ones((20000, 3), dtype=float) # Initialize locations matrix
@@ -409,8 +408,7 @@ def room_impulse_hrtf(
         [-1, -1,  1],
         [-1, -1, -1],
     ], dtype=float) * src.reshape((1, -1))
-    Nx = np.ceil(dmax / (2 * walls[1])) # Appropriate number of (0, 0, 0)
-    
+    Nx = np.ceil(dmax / (2 * walls[0])) # Appropriate number of (0, 0, 0)
     loc_num = 0
     for nx in np.arange(Nx, -1, -1, dtype=int):
         if nx < Nx:

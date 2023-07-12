@@ -8,7 +8,7 @@ Required Python packages: `numpy`, `scipy`, `soundfile`
 
 ### Python interface for directly calling the MATLAB virtual acoustic room simulator by Mike O'Connell and Jay Desloge.
 ```
-simulator_matlab_engine.py
+simulator_matlab.py
 ```
 Requires the MATLAB engine for Python to use (Conda environment: `/om2/user/msaddler/.conda/envs/matlab`)
 

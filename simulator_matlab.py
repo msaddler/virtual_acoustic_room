@@ -101,7 +101,7 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
     assert is_valid_position(head_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid head position"
     assert is_valid_position(src_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid source position"
     if verbose:
-        print("[room simulator] head_pos: {}, src_pos: {}, room_dim: {}".format(
+        print("[get_brir] head_pos: {}, src_pos: {}, room_dim: {}".format(
             head_pos_xyz.tolist(),
             src_pos_xyz.tolist(),
             room_dim_xyz.tolist()))
@@ -122,10 +122,10 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
         dsply=0,
         eng=eng)
     if verbose:
-        print(f'[room simulator] time elapsed: {time.time() - t0} seconds')
+        print(f'[get_brir] time elapsed: {time.time() - t0} seconds')
     if incorporate_lead_zeros:
         lead_zeros = int(np.round(lead_zeros))
-        print(f'[room simulator] incorporated {lead_zeros} leading zeros')
+        print(f'[get_brir] incorporated {lead_zeros} leading zeros')
         if lead_zeros >= 0:
             h_out = np.pad(h_out, ((lead_zeros, 0), (0, 0)))
             brir = h_out[:int(dur * sr)]

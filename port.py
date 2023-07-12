@@ -128,27 +128,26 @@ def shapedfilter_hrtf(sdelay, freq, gain, sr, ctap, ctap2):
 
 def impulse_generate_hrtf(
         h,
-        src,
-        h_cent,
-        h_az,
+        head_cent,
+        head_azim,
         s_locations,
-        s_reflects,
+        s_reflections,
         m_locs,
         m_locs_xyz,
         m_locs_xyz_logdist,
         m_files,
         m_delay,
-        m_sym,
+        use_m_sym,
         sr,
         c,
         ntaps,
-        log_dist,
+        use_log_distance,
         ctap,
         ctap2,
         fgains,
         nfreq,
         lead_zeros,
-        jitter):
+        use_jitter):
     """
     """
     jitter_reflects = 5
@@ -160,35 +159,35 @@ def impulse_generate_hrtf(
     # through each wall) for each source location.
     gains = np.ones((s_locations.shape[0], nfreq.shape[0]), dtype=float)
     for itr_wall in range(6):
-        gains = gains * np.power(fgains[itr_wall:itr_wall + 1, :], s_reflects[:, itr_wall:itr_wall + 1])
-    # If m_sym is active, convert 180° to 360° sources to 0° to 180° sources
-    s_locations_relh = s_locations - h_cent.reshape((1, -1))
+        gains = gains * np.power(fgains[itr_wall:itr_wall + 1, :], s_reflections[:, itr_wall:itr_wall + 1])
+    # If use_m_sym is active, convert 180° to 360° sources to 0° to 180° sources
+    s_locations_relh = s_locations - head_cent.reshape((1, -1))
     s_locations_pol = np.zeros_like(s_locations)
     s_locations_pol[:, 0] = np.sqrt(np.sum(np.square(s_locations_relh), axis=1))
-    s_locations_pol[:, 1] = np.rad2deg(np.angle(s_locations_relh[:, 0] - 1j * s_locations_relh[:, 1])) - h_az
+    s_locations_pol[:, 1] = np.rad2deg(np.angle(s_locations_relh[:, 0] - 1j * s_locations_relh[:, 1])) - head_azim
     s_locations_pol[:, 2] = np.rad2deg(np.arcsin(s_locations_relh[:, 2] / s_locations_pol[:, 0]))
-    if m_sym:
+    if use_m_sym:
         flip = s_locations_pol[:, 1] < 0
         s_locations_pol[:, 1] = np.abs(s_locations_pol[:, 1])
         r = s_locations_pol[:, 0]
         s_locations = np.stack([
-            r * np.cos(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
-            r * -np.sin(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * np.cos(np.deg2rad(s_locations_pol[:, 1] + head_azim)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * -np.sin(np.deg2rad(s_locations_pol[:, 1] + head_azim)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
             r * np.sin(np.deg2rad(s_locations_pol[:, 2])),
         ], axis=1)
-        s_locations = s_locations + h_cent.reshape((1, -1))
+        s_locations = s_locations + head_cent.reshape((1, -1))
     else:
         flip = np.zeros((s_locations.shape[0]), dtype=bool)
     
-    # If log_dist is active, form s_locations_logdist
-    if log_dist:
+    # If use_log_distance is active, form s_locations_logdist
+    if use_log_distance:
         r = np.log(s_locations_pol[:, 0]) - np.log(0.05)
         s_locations_logdist = np.stack([
-            r * np.cos(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
-            r * -np.sin(np.deg2rad(s_locations_pol[:, 1] + h_az)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * np.cos(np.deg2rad(s_locations_pol[:, 1] + head_azim)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
+            r * -np.sin(np.deg2rad(s_locations_pol[:, 1] + head_azim)) * np.cos(np.deg2rad(s_locations_pol[:, 2])),
             r * np.sin(np.deg2rad(s_locations_pol[:, 2])),
         ], axis=1)
-        s_locations_logdist = s_locations_logdist + h_cent.reshape((1, -1))
+        s_locations_logdist = s_locations_logdist + head_cent.reshape((1, -1))
         D = m_locs_xyz_logdist[:, np.newaxis, :] - s_locations_logdist[np.newaxis, :, :]
     else:
         D = m_locs_xyz[:, np.newaxis, :] - s_locations[np.newaxis, :, :]
@@ -199,11 +198,11 @@ def impulse_generate_hrtf(
     """
     Part II: Based on the center of the head, introduce a 
     1 percent jitter to add into all source-to-mic distances
-    that are reflected by more than 5 walls (if jitter flag)
+    that are reflected by more than 5 walls (if use_jitter)
     """
-    if jitter:
+    if use_jitter:
         jitt = np.random.randn(s_locations_pol.shape[0])
-        jitt[s_reflects.sum(axis=1) < jitter_reflects] = 0
+        jitt[s_reflections.sum(axis=1) < jitter_reflects] = 0
         s_locations_pol[:, 0] = s_locations_pol[:, 0] + jitt
     # Calculate the relative additional distance between each
     # (jittered) source and the corresponding measurement location
@@ -317,29 +316,27 @@ def impulse_generate_hrtf(
 
 def room_impulse_hrtf(
         src_loc=[5, 5, 5],
-        head_center=[2, 2, 2],
-        head_azimuth=0,
-        meas_sym=True,
+        head_cent=[2, 2, 2],
+        head_azim=0,
+        use_m_sym=True,
         walls=[10, 10, 10],
         wtypes=[3, 3, 3, 3, 3, 3],
         sr=44100,
         c=344.5,
         dur=0.5,
-        log_dist=False,
-        jitter=True,
-        highpass=True):
+        use_log_distance=False,
+        use_jitter=True,
+        use_highpass=True):
     """
     """
-    meas_files = scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file']
-    meas_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
-    
-    src = np.array(src_loc, dtype=float)
-    h_cent = np.array(head_center, dtype=float)
-    h_az = np.array(head_azimuth, dtype=float)
-    m_locs = np.array(meas_locs, dtype=float)
-    m_files = meas_files
-    m_delay = (np.sqrt(np.sum(np.square(src - h_cent))) / c) * np.ones((meas_locs.shape[0],))
-    m_sym = meas_sym
+    src_loc = np.array(src_loc, dtype=float)
+    head_cent = np.array(head_cent, dtype=float)
+    head_azim = np.array(head_azim, dtype=float)
+    m_files = scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file']
+    m_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
+    m_locs = np.array(m_locs, dtype=float)
+    m_delay = (np.sqrt(np.sum(np.square(src_loc - head_cent))) / c) * np.ones((m_locs.shape[0],))
+    use_m_sym = use_m_sym
 
     # Frequency-dependent reflection coefficients for each wall
     fgains = np.zeros((6, 6), dtype=float)
@@ -360,32 +357,30 @@ def room_impulse_hrtf(
     else:
         ctap2 = 33 # For frequency-dependent wall reflections, use a longer filter
     
-    num_rec = 2 # Number of ears
-    
     # Convert measured HRTF locations into room (xyz) coordinates (and log distance locations)
     m_locs_xyz = np.ones_like(m_locs)
     r = m_locs[:, 0]
-    m_locs_xyz[:, 0] = r * np.cos(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz[:, 1] = r * -np.sin(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz[:, 0] = r * np.cos(np.deg2rad(m_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz[:, 1] = r * -np.sin(np.deg2rad(m_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(m_locs[:, 2]))
     m_locs_xyz[:, 2] = r * np.sin(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz = m_locs_xyz + h_cent.reshape([1, -1])
+    m_locs_xyz = m_locs_xyz + head_cent.reshape([1, -1])
     m_locs_xyz_logdist = np.ones_like(m_locs)
     r = (np.log(m_locs[:, 0]) - np.log(0.05))
-    m_locs_xyz_logdist[:, 0] = r * np.cos(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist[:, 1] = r * -np.sin(np.deg2rad(m_locs[:, 1] + h_az)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz_logdist[:, 0] = r * np.cos(np.deg2rad(m_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(m_locs[:, 2]))
+    m_locs_xyz_logdist[:, 1] = r * -np.sin(np.deg2rad(m_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(m_locs[:, 2]))
     m_locs_xyz_logdist[:, 2] = r * np.sin(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist = m_locs_xyz_logdist + h_cent.reshape((1, -1))
+    m_locs_xyz_logdist = m_locs_xyz_logdist + head_cent.reshape((1, -1))
     
     # Calculate the number of lead zeros to strip
-    idx_min = np.argmin(np.sqrt(np.sum(np.square(src.reshape((1, -1)) - m_locs_xyz), axis=1)))
+    idx_min = np.argmin(np.sqrt(np.sum(np.square(src_loc.reshape((1, -1)) - m_locs_xyz), axis=1)))
     src_mloc = m_locs_xyz[idx_min, :] # Nearest measured loc or direct path
-    rel_dist = np.linalg.norm(src - h_cent, 2) - np.linalg.norm(src_mloc - h_cent, 2)
+    rel_dist = np.linalg.norm(src_loc - head_cent, 2) - np.linalg.norm(src_mloc - head_cent, 2)
     lead_zeros = m_delay[idx_min] + np.floor(sr * rel_dist / c)
     
     # Initialize output matrix (will later truncate to exactly ntaps in length)
-    ht, sr_ht = sf.read(meas_files[0].replace('\\', '/').replace(' ', ''))
-    assert sr == sr_ht
-    h = np.zeros((ntaps + ctap + ctap2 + ht.shape[0], num_rec), dtype=float)
+    hrtf, sr_hrtf = sf.read(m_files[0].replace('\\', '/').replace(' ', ''))
+    assert sr == sr_hrtf, "sampling rate does not match HRTF"
+    h = np.zeros((ntaps + ctap + ctap2 + hrtf.shape[0], 2), dtype=float) # 2 ears
     
     """
     Part II: determine source image locations and corresponding impulse
@@ -407,7 +402,7 @@ def room_impulse_hrtf(
     # Maximum source distance to be in impulse response
     dmax = np.ceil((ntaps + lead_zeros) * c / sr + np.max(walls))
     s_locations = np.ones((20000, 3), dtype=float) # Initialize locations matrix
-    s_reflects = np.ones((20000, 6), dtype=float) # Initialize reflections matrix
+    s_reflections = np.ones((20000, 6), dtype=float) # Initialize reflections matrix
     # Vector to get locations from the (0, 0, 0) corner images
     src_pts = np.array([
         [ 1,  1,  1],
@@ -418,7 +413,7 @@ def room_impulse_hrtf(
         [-1,  1, -1],
         [-1, -1,  1],
         [-1, -1, -1],
-    ], dtype=float) * src.reshape((1, -1))
+    ], dtype=float) * src_loc.reshape((1, -1))
     Nx = np.ceil(dmax / (2 * walls[0])) # Appropriate number of (0, 0, 0)
     loc_num = 0
     for nx in np.arange(Nx, -1, -1, dtype=int):
@@ -446,82 +441,80 @@ def room_impulse_hrtf(
         
         # For each image of (0, 0, 0), get the 8 source images and number of reflections at each wall
         for k in range(8):
-            s_refls = np.zeros((X.shape[0], 6), dtype=float)
+            s_refs = np.zeros((X.shape[0], 6), dtype=float)
             s_locs = np.concatenate([Xw, Yw, Zw], axis=1) + src_pts[k, :].reshape((1, -1))
-            s_refls[:, 0:1] = (src_pts[k, 0] > 0) * np.abs(X) + (src_pts[k, 0] < 0) * np.abs(X - 1)
-            s_refls[:, 1:2] = np.abs(X)
-            s_refls[:, 2:3] = (src_pts[k, 1] > 0) * np.abs(Y) + (src_pts[k, 1] < 0) * np.abs(Y - 1)
-            s_refls[:, 3:4] = np.abs(Y)
-            s_refls[:, 4:5] = (src_pts[k, 2] > 0) * np.abs(Z) + (src_pts[k, 2] < 0) * np.abs(Z - 1)
-            s_refls[:, 5:6] = np.abs(Z)
+            s_refs[:, 0:1] = (src_pts[k, 0] > 0) * np.abs(X) + (src_pts[k, 0] < 0) * np.abs(X - 1)
+            s_refs[:, 1:2] = np.abs(X)
+            s_refs[:, 2:3] = (src_pts[k, 1] > 0) * np.abs(Y) + (src_pts[k, 1] < 0) * np.abs(Y - 1)
+            s_refs[:, 3:4] = np.abs(Y)
+            s_refs[:, 4:5] = (src_pts[k, 2] > 0) * np.abs(Z) + (src_pts[k, 2] < 0) * np.abs(Z - 1)
+            s_refs[:, 5:6] = np.abs(Z)
             
             while (loc_num + s_locs.shape[0]) > 20000:
                 m = 20000 - loc_num
                 s_locations[slice(loc_num, loc_num + m), :] = s_locs[slice(0, m), :]
-                s_reflects[slice(loc_num, loc_num + m), :] = s_refls[slice(0, m), :]
+                s_reflections[slice(loc_num, loc_num + m), :] = s_refs[slice(0, m), :]
                 # Get impulse response contributions
                 h, s_locations = impulse_generate_hrtf(
                     h,
-                    src,
-                    h_cent,
-                    h_az,
+                    head_cent,
+                    head_azim,
                     s_locations,
-                    s_reflects,
+                    s_reflections,
                     m_locs,
                     m_locs_xyz,
                     m_locs_xyz_logdist,
                     m_files,
                     m_delay,
-                    m_sym,
+                    use_m_sym,
                     sr,
                     c,
                     ntaps,
-                    log_dist,
+                    use_log_distance,
                     ctap,
                     ctap2,
                     fgains,
                     nfreq,
                     lead_zeros,
-                    jitter)
+                    use_jitter)
                 loc_num = 0 # Reset loc_num counter and continue
                 s_locs = s_locs[slice(m, s_locs.shape[0]), :]
-                s_refls = s_refls[slice(m, s_refls.shape[0]), :]
+                s_refs = s_refs[slice(m, s_refs.shape[0]), :]
             
             s_locations[slice(loc_num, loc_num + s_locs.shape[0]), :] = s_locs
-            s_reflects[slice(loc_num, loc_num + s_refls.shape[0]), :] = s_refls
+            s_reflections[slice(loc_num, loc_num + s_refs.shape[0]), :] = s_refs
             loc_num = loc_num + s_locs.shape[0]
     
     # When all locations have been generated, process the final ones
     s_locations = s_locations[0:loc_num, :]
-    s_reflects = s_reflects[0:loc_num, :]
+    s_reflections = s_reflections[0:loc_num, :]
     h, s_locations = impulse_generate_hrtf(
         h,
-        src,
-        h_cent,
-        h_az,
+        head_cent,
+        head_azim,
         s_locations,
-        s_reflects,
+        s_reflections,
         m_locs,
         m_locs_xyz,
         m_locs_xyz_logdist,
         m_files,
         m_delay,
-        m_sym,
+        use_m_sym,
         sr,
         c,
         ntaps,
-        log_dist,
+        use_log_distance,
         ctap,
         ctap2,
         fgains,
         nfreq,
         lead_zeros,
-        jitter)
+        use_jitter)
     
     """
     Part III: Finalize output
     """
-    if highpass:
+    if use_highpass:
         # Highpass filter if desired
         b, a = scipy.signal.butter(2, 0.005, btype='high')
         h = scipy.signal.lfilter(b, a, h, axis=0)

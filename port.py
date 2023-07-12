@@ -189,11 +189,11 @@ def impulse_generate_hrtf(
         head_azim=None,
         s_locations=None,
         s_reflections=None,
-        m_locs=None,
-        m_locs_xyz=None,
-        m_locs_xyz_logdist=None,
-        m_files=None,
-        m_delay=None,
+        hrtf_locs=None,
+        hrtf_locs_xyz=None,
+        hrtf_locs_xyz_logdist=None,
+        hrtf_firs=None,
+        hrtf_delay=None,
         sr=None,
         c=None,
         ntaps=None,
@@ -255,13 +255,13 @@ def impulse_generate_hrtf(
             r * np.sin(np.deg2rad(s_locations_pol[:, 2])),
         ], axis=1)
         s_locations_logdist = s_locations_logdist + head_cent.reshape((1, -1))
-        D = m_locs_xyz_logdist[:, np.newaxis, :] - \
+        D = hrtf_locs_xyz_logdist[:, np.newaxis, :] - \
             s_locations_logdist[np.newaxis, :, :]
     else:
-        D = m_locs_xyz[:, np.newaxis, :] - s_locations[np.newaxis, :, :]
+        D = hrtf_locs_xyz[:, np.newaxis, :] - s_locations[np.newaxis, :, :]
     # For each source, determine the closest measurement spot
     D = np.sqrt(np.sum(np.square(D), axis=2))
-    near_m_loc = np.argmin(D, axis=0)
+    nearest_hrtf_loc = np.argmin(D, axis=0)
 
     """
     Part II: Based on the center of the head, introduce a 
@@ -274,16 +274,16 @@ def impulse_generate_hrtf(
         s_locations_pol[:, 0] = s_locations_pol[:, 0] + jitt
     # Calculate the relative additional distance between each
     # (jittered) source and the corresponding measurement location
-    rel_dist = s_locations_pol[:, 0] - m_locs[near_m_loc, 0]
+    rel_dist = s_locations_pol[:, 0] - hrtf_locs[nearest_hrtf_loc, 0]
 
     """
     Part III: For each measurement location, generate impulse
-    response from corresponding sources to meas loc.  Then
-    incorporate HRTFs.  Treat flips and no flips accordingly.
+    response from corresponding sources to measured location
+    and then incorporate HRTFs (treat flips / no flips accordingly)
     """
-    hrtf_temp = np.zeros((m_locs.shape[0], *h.shape), dtype=float)
+    hrtf_temp = np.zeros((hrtf_locs.shape[0], *h.shape), dtype=float)
     for l in range(hrtf_temp.shape[0]):
-        IDX_l = near_m_loc == l
+        IDX_l = nearest_hrtf_loc == l
         if IDX_l.sum() > 0:
             IDX_noflip = np.logical_and(IDX_l, ~flip)
             IDX_flip = np.logical_and(IDX_l, flip)
@@ -294,12 +294,12 @@ def impulse_generate_hrtf(
             if IDX_noflip.sum() > 0:
                 # Get sample delays to the measured location
                 thit = ctap + ctap2 - lead_zeros + \
-                    m_delay[l] + (rel_dist[IDX_noflip] * sr / c)
+                    hrtf_delay[l] + (rel_dist[IDX_noflip] * sr / c)
                 ihit = np.floor(thit)
                 fhit = thit - ihit
                 gains_noflip = gains[IDX_noflip, :]
                 # Get scale factors to account for distance traveled
-                m_sc = 1 / m_locs[near_m_loc[IDX_noflip], 0]
+                m_sc = 1 / hrtf_locs[nearest_hrtf_loc[IDX_noflip], 0]
                 s_sc = 1 / s_locations_pol[IDX_noflip, 0]
                 rel_sc = s_sc / m_sc
                 # Eliminate locations that are too far away to enter into impulse response
@@ -331,9 +331,7 @@ def impulse_generate_hrtf(
                     for k in range(v.sum()):
                         ht[ht_ind[k], 0] = ht[ht_ind[k], 0] + h_temp[k, :]
                     # Incorporate HRTF impulse response and add into overall impulse response matrix
-                    hrtf, sr_hrtf = sf.read(
-                        m_files[l].replace('\\', '/').replace(' ', ''))
-                    assert sr == sr_hrtf, "sampling rate does not match HRTF"
+                    hrtf = hrtf_firs[l]
                     new_vals = np.stack([
                         scipy.signal.fftconvolve(
                             ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
@@ -347,12 +345,12 @@ def impulse_generate_hrtf(
             if IDX_flip.sum() > 0:
                 # Get sample delays to the measured location
                 thit = ctap + ctap2 - lead_zeros + \
-                    m_delay[l] + (rel_dist[IDX_flip] * sr / c)
+                    hrtf_delay[l] + (rel_dist[IDX_flip] * sr / c)
                 ihit = np.floor(thit)
                 fhit = thit - ihit
                 gains_flip = gains[IDX_flip, :]
                 # Get scale factors to account for distance traveled
-                m_sc = 1 / m_locs[near_m_loc[IDX_flip], 0]
+                m_sc = 1 / hrtf_locs[nearest_hrtf_loc[IDX_flip], 0]
                 s_sc = 1 / s_locations_pol[IDX_flip, 0]
                 rel_sc = s_sc / m_sc
                 # Eliminate locations that are too far away to enter into impulse response
@@ -384,9 +382,7 @@ def impulse_generate_hrtf(
                     for k in range(v.sum()):
                         ht[ht_ind[k], 0] = ht[ht_ind[k], 0] + h_temp[k, :]
                     # Incorporate HRTF impulse response and add into overall impulse response matrix
-                    hrtf, sr_hrtf = sf.read(
-                        m_files[l].replace('\\', '/').replace(' ', ''))
-                    assert sr == sr_hrtf, "sampling rate does not match HRTF"
+                    hrtf = hrtf_firs[l]
                     new_vals = np.stack([
                         scipy.signal.fftconvolve(
                             ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
@@ -409,6 +405,8 @@ def room_impulse_hrtf(
         sr=44100,
         c=344.5,
         dur=0.5,
+        hrtf_locs=None,
+        hrtf_firs=None,
         use_hrtf_symmetry=True,
         use_log_distance=False,
         use_jitter=True,
@@ -419,11 +417,22 @@ def room_impulse_hrtf(
     src_loc = np.array(src_loc, dtype=float)
     head_cent = np.array(head_cent, dtype=float)
     head_azim = np.array(head_azim, dtype=float)
-    m_files = scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file']
-    m_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
-    m_locs = np.array(m_locs, dtype=float)
-    m_delay = (np.sqrt(np.sum(np.square(src_loc - head_cent))) /
-               c) * np.ones((m_locs.shape[0],))
+    if hrtf_firs is None:
+        hrtf_firs = []
+        hrtf_filenames = scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file']
+        for fn in hrtf_filenames:
+            hrtf, sr_hrtf = sf.read(fn.replace('\\', '/').replace(' ', ''))
+            assert sr == sr_hrtf, "sampling rate does not match HRTF"
+            hrtf_firs.append(hrtf)
+        hrtf_firs = np.array(hrtf_firs, dtype=float)
+        print(f"Loaded KEMAR `hrtf_firs` (Gardner & Martin, 1995): {hrtf_firs.shape}")
+    if hrtf_locs is None:
+        hrtf_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
+        hrtf_locs = np.array(hrtf_locs, dtype=float)
+        print(f"Loaded KEMAR `hrtf_locs` (Gardner & Martin, 1995): {hrtf_locs.shape}")
+    assert hrtf_firs.shape[0] == hrtf_locs.shape[0]
+    hrtf_delay = (np.sqrt(np.sum(np.square(src_loc - head_cent))) /
+                  c) * np.ones((hrtf_locs.shape[0],))
 
     # Frequency-dependent reflection coefficients for each wall
     fgains = np.zeros((6, 6), dtype=float)
@@ -446,36 +455,34 @@ def room_impulse_hrtf(
         ctap2 = 33  # For frequency-dependent wall reflections, use a longer filter
 
     # Convert measured HRTF locations into room (xyz) coordinates (and log distance locations)
-    m_locs_xyz = np.ones_like(m_locs)
-    r = m_locs[:, 0]
-    m_locs_xyz[:, 0] = r * np.cos(np.deg2rad(m_locs[:, 1] + head_azim)
-                                  ) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz[:, 1] = r * -np.sin(np.deg2rad(m_locs[:, 1] + head_azim)
-                                   ) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz[:, 2] = r * np.sin(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz = m_locs_xyz + head_cent.reshape([1, -1])
-    m_locs_xyz_logdist = np.ones_like(m_locs)
-    r = (np.log(m_locs[:, 0]) - np.log(0.05))
-    m_locs_xyz_logdist[:, 0] = r * np.cos(np.deg2rad(
-        m_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist[:, 1] = r * -np.sin(np.deg2rad(
-        m_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist[:, 2] = r * np.sin(np.deg2rad(m_locs[:, 2]))
-    m_locs_xyz_logdist = m_locs_xyz_logdist + head_cent.reshape((1, -1))
+    hrtf_locs_xyz = np.ones_like(hrtf_locs)
+    r = hrtf_locs[:, 0]
+    hrtf_locs_xyz[:, 0] = r * np.cos(np.deg2rad(hrtf_locs[:, 1] + head_azim)
+                                     ) * np.cos(np.deg2rad(hrtf_locs[:, 2]))
+    hrtf_locs_xyz[:, 1] = r * -np.sin(np.deg2rad(hrtf_locs[:, 1] + head_azim)
+                                      ) * np.cos(np.deg2rad(hrtf_locs[:, 2]))
+    hrtf_locs_xyz[:, 2] = r * np.sin(np.deg2rad(hrtf_locs[:, 2]))
+    hrtf_locs_xyz = hrtf_locs_xyz + head_cent.reshape([1, -1])
+    hrtf_locs_xyz_logdist = np.ones_like(hrtf_locs)
+    r = (np.log(hrtf_locs[:, 0]) - np.log(0.05))
+    hrtf_locs_xyz_logdist[:, 0] = r * np.cos(np.deg2rad(
+        hrtf_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(hrtf_locs[:, 2]))
+    hrtf_locs_xyz_logdist[:, 1] = r * -np.sin(np.deg2rad(
+        hrtf_locs[:, 1] + head_azim)) * np.cos(np.deg2rad(hrtf_locs[:, 2]))
+    hrtf_locs_xyz_logdist[:, 2] = r * np.sin(np.deg2rad(hrtf_locs[:, 2]))
+    hrtf_locs_xyz_logdist = hrtf_locs_xyz_logdist + head_cent.reshape((1, -1))
 
     # Calculate the number of lead zeros to strip
     idx_min = np.argmin(
-        np.sqrt(np.sum(np.square(src_loc.reshape((1, -1)) - m_locs_xyz), axis=1)))
-    src_mloc = m_locs_xyz[idx_min, :]  # Nearest measured loc or direct path
+        np.sqrt(np.sum(np.square(src_loc.reshape((1, -1)) - hrtf_locs_xyz), axis=1)))
+    src_mloc = hrtf_locs_xyz[idx_min, :]  # Nearest measured loc or direct path
     rel_dist = np.linalg.norm(src_loc - head_cent, 2) - \
         np.linalg.norm(src_mloc - head_cent, 2)
-    lead_zeros = m_delay[idx_min] + np.floor(sr * rel_dist / c)
+    lead_zeros = hrtf_delay[idx_min] + np.floor(sr * rel_dist / c)
 
     # Initialize output matrix (will later truncate to exactly ntaps in length)
-    hrtf, sr_hrtf = sf.read(m_files[0].replace('\\', '/').replace(' ', ''))
-    assert sr == sr_hrtf, "sampling rate does not match HRTF"
     h = np.zeros(
-        (ntaps + ctap + ctap2 + hrtf.shape[0], 2), dtype=float)  # 2 ears
+        (ntaps + ctap + ctap2 + hrtf_firs.shape[1], 2), dtype=float)  # 2 ears
 
     """
     Part II: determine source image locations and corresponding impulse
@@ -567,11 +574,11 @@ def room_impulse_hrtf(
                     head_azim=head_azim,
                     s_locations=s_locations,
                     s_reflections=s_reflections,
-                    m_locs=m_locs,
-                    m_locs_xyz=m_locs_xyz,
-                    m_locs_xyz_logdist=m_locs_xyz_logdist,
-                    m_files=m_files,
-                    m_delay=m_delay,
+                    hrtf_locs=hrtf_locs,
+                    hrtf_locs_xyz=hrtf_locs_xyz,
+                    hrtf_locs_xyz_logdist=hrtf_locs_xyz_logdist,
+                    hrtf_firs=hrtf_firs,
+                    hrtf_delay=hrtf_delay,
                     sr=sr,
                     c=c,
                     ntaps=ntaps,
@@ -600,11 +607,11 @@ def room_impulse_hrtf(
         head_azim=head_azim,
         s_locations=s_locations,
         s_reflections=s_reflections,
-        m_locs=m_locs,
-        m_locs_xyz=m_locs_xyz,
-        m_locs_xyz_logdist=m_locs_xyz_logdist,
-        m_files=m_files,
-        m_delay=m_delay,
+        hrtf_locs=hrtf_locs,
+        hrtf_locs_xyz=hrtf_locs_xyz,
+        hrtf_locs_xyz_logdist=hrtf_locs_xyz_logdist,
+        hrtf_firs=hrtf_firs,
+        hrtf_delay=hrtf_delay,
         sr=sr,
         c=c,
         ntaps=ntaps,
@@ -641,6 +648,8 @@ def get_brir(
         sr=44100,
         c=344.5,
         dur=0.5,
+        hrtf_locs=None,
+        hrtf_firs=None,
         use_hrtf_symmetry=True,
         use_log_distance=False,
         use_jitter=True,
@@ -681,6 +690,8 @@ def get_brir(
         sr=sr,
         c=c,
         dur=dur,
+        hrtf_locs=hrtf_locs,
+        hrtf_firs=hrtf_firs,
         use_hrtf_symmetry=use_hrtf_symmetry,
         use_log_distance=use_log_distance,
         use_jitter=use_jitter,

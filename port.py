@@ -202,7 +202,7 @@ def impulse_generate_hrtf(
         fgains=None,
         nfreq=None,
         lead_zeros=None,
-        use_m_sym=None,
+        use_hrtf_symmetry=None,
         use_log_distance=None,
         use_jitter=None):
     """
@@ -220,7 +220,7 @@ def impulse_generate_hrtf(
         gains = gains * \
             np.power(fgains[itr_wall:itr_wall + 1, :],
                      s_reflections[:, itr_wall:itr_wall + 1])
-    # If use_m_sym is active, convert 180° to 360° sources to 0° to 180° sources
+    # If use_hrtf_symmetry is active, convert 180° to 360° sources to 0° to 180° sources
     s_locations_relh = s_locations - head_cent.reshape((1, -1))
     s_locations_pol = np.zeros_like(s_locations)
     s_locations_pol[:, 0] = np.sqrt(
@@ -229,7 +229,7 @@ def impulse_generate_hrtf(
         np.angle(s_locations_relh[:, 0] - 1j * s_locations_relh[:, 1])) - head_azim
     s_locations_pol[:, 2] = np.rad2deg(
         np.arcsin(s_locations_relh[:, 2] / s_locations_pol[:, 0]))
-    if use_m_sym:
+    if use_hrtf_symmetry:
         flip = s_locations_pol[:, 1] < 0
         s_locations_pol[:, 1] = np.abs(s_locations_pol[:, 1])
         r = s_locations_pol[:, 0]
@@ -409,7 +409,7 @@ def room_impulse_hrtf(
         sr=44100,
         c=344.5,
         dur=0.5,
-        use_m_sym=True,
+        use_hrtf_symmetry=True,
         use_log_distance=False,
         use_jitter=True,
         use_highpass=True):
@@ -424,7 +424,6 @@ def room_impulse_hrtf(
     m_locs = np.array(m_locs, dtype=float)
     m_delay = (np.sqrt(np.sum(np.square(src_loc - head_cent))) /
                c) * np.ones((m_locs.shape[0],))
-    use_m_sym = use_m_sym
 
     # Frequency-dependent reflection coefficients for each wall
     fgains = np.zeros((6, 6), dtype=float)
@@ -581,7 +580,7 @@ def room_impulse_hrtf(
                     fgains=fgains,
                     nfreq=nfreq,
                     lead_zeros=lead_zeros,
-                    use_m_sym=use_m_sym,
+                    use_hrtf_symmetry=use_hrtf_symmetry,
                     use_log_distance=use_log_distance,
                     use_jitter=use_jitter)
                 loc_num = 0  # Reset loc_num counter and continue
@@ -614,7 +613,7 @@ def room_impulse_hrtf(
         fgains=fgains,
         nfreq=nfreq,
         lead_zeros=lead_zeros,
-        use_m_sym=use_m_sym,
+        use_hrtf_symmetry=use_hrtf_symmetry,
         use_log_distance=use_log_distance,
         use_jitter=use_jitter)
 
@@ -642,7 +641,7 @@ def get_brir(
         sr=44100,
         c=344.5,
         dur=0.5,
-        use_m_sym=True,
+        use_hrtf_symmetry=True,
         use_log_distance=False,
         use_jitter=True,
         use_highpass=True,
@@ -682,7 +681,7 @@ def get_brir(
         sr=sr,
         c=c,
         dur=dur,
-        use_m_sym=use_m_sym,
+        use_hrtf_symmetry=use_hrtf_symmetry,
         use_log_distance=use_log_distance,
         use_jitter=use_jitter,
         use_highpass=use_highpass)

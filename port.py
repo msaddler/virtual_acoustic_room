@@ -1,14 +1,61 @@
 import os
 import sys
 import pdb
+import time
 import numpy as np
 import soundfile as sf
 import scipy.signal
 import scipy.interpolate
 
 
+"""
+The MATLAB function `acoeff_hrtf.m` maps materials to acoustic absorption coefficients.
+This dictionary maps integer codes to materials for which coefficients are available.
+"""
+map_int_to_material = {
+    # WALLS
+    1: 'Brick',
+    2: 'Concrete, painted',
+    3: 'Window Glass',
+    4: 'Marble',
+    5: 'Plaster on Concrete',
+    6: 'Plywood',
+    7: 'Concrete block, coarse',
+    8: 'Heavyweight drapery',
+    9: 'Fiberglass wall treatment, 1 in',
+    10: 'Fiberglass wall treatment, 7 in',
+    11: 'Wood panelling on glass fiber blanket',
+    # FLOORS
+    12: 'Wood parquet on concrete',
+    13: 'Linoleum',
+    14: 'Carpet on concrete',
+    15: 'Carpet on foam rubber padding',
+    # CEILINGS
+    16: 'Plaster, gypsum, or lime on lath',
+    17: 'Acoustic tiles, 0.625", 16" below ceiling',
+    18: 'Acoustic tiles, 0.5", 16" below ceiling',
+    19: 'Acoustic tiles, 0.5" cemented to ceiling',
+    20: 'Highly absorptive panels, 1", 16" below ceiling',
+    # OTHERS
+    21: 'Upholstered seats',
+    22: 'Audience in upholstered seats',
+    23: 'Grass',
+    24: 'Soil',
+    25: 'Water surface',
+    26: 'Anechoic',
+    27: 'Uniform (0.6) absorbtion coefficient',
+    28: 'Uniform (0.2) absorbtion coefficient',
+    29: 'Uniform (0.8) absorbtion coefficient',
+    30: 'Uniform (0.14) absorbtion coefficient',
+    31: 'Artificial - absorbs more at high freqs',
+    32: 'Artificial with absorption higher in middle ranges',
+    33: 'Artificial - absorbs more at low freqs',
+}
+
+
 def acoeff_hrtf(material, freq=[125, 250, 500, 1000, 2000, 4000]):
     """
+    Python implementation of `acoeff_hrtf.m` by msaddler (2023/07)
     """
     freq = np.array(freq, dtype=float)
     freqtable = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
@@ -82,6 +129,7 @@ def acoeff_hrtf(material, freq=[125, 250, 500, 1000, 2000, 4000]):
 
 def shapedfilter_hrtf(sdelay, freq, gain, sr, ctap, ctap2):
     """
+    Python implementation of `shapedfilter_hrtf.m` by msaddler (2023/07)
     """
     sdelay = sdelay.reshape((-1, 1))  # Ensure sdelay is an M x 1 matrix
     assert np.all(sdelay >= 0), "The sample delay must be positive"
@@ -158,6 +206,7 @@ def impulse_generate_hrtf(
         use_log_distance=None,
         use_jitter=None):
     """
+    Python implementation of `impulse_generate_hrtf.m` by msaddler (2023/07)
     """
     jitter_reflects = 5
 
@@ -365,6 +414,7 @@ def room_impulse_hrtf(
         use_jitter=True,
         use_highpass=True):
     """
+    Python implementation of `room_impulse_hrtf.m` by msaddler (2023/07)
     """
     src_loc = np.array(src_loc, dtype=float)
     head_cent = np.array(head_cent, dtype=float)
@@ -578,3 +628,75 @@ def room_impulse_hrtf(
     # Restrict to `ntaps` in length
     hout = h[:ntaps, :]
     return hout, lead_zeros
+
+
+def get_brir(
+        room_materials=[26, 26, 26, 26, 26, 26],
+        room_dim_xyz=[10, 10, 3],
+        head_pos_xyz=[5, 5, 1.5],
+        head_azim=0,
+        src_azim=0,
+        src_elev=0,
+        src_dist=1.4,
+        buffer_pos=0,
+        sr=44100,
+        c=344.5,
+        dur=0.5,
+        use_m_sym=True,
+        use_log_distance=False,
+        use_jitter=True,
+        use_highpass=True,
+        incorporate_lead_zeros=True,
+        verbose=True):
+    """
+    Main function to generate binaural room impulse response (BRIR) from
+    a room description, a listener position, and a source position.
+    """
+    room_materials = np.array(room_materials)
+    msg = "room_materials shape: [wall_x0, wall_x, wall_y0, wall_y, floor, ceiling]"
+    assert room_materials.shape == (6,), msg
+    room_dim_xyz = np.array(room_dim_xyz)
+    msg = "room_dim_xyz shape: [x_len (length), y_len (width), z_len (height)]"
+    assert room_dim_xyz.shape == (3,), msg
+    head_pos_xyz = np.array(head_pos_xyz)
+    msg = "head_pos_xyz shape: [x_head, y_head, z_head]"
+    assert head_pos_xyz.shape == (3,), msg
+    src_pos_xyz = np.array([
+        src_dist * np.cos(np.deg2rad(src_elev)) * np.cos(np.deg2rad(src_azim + head_azim)) + head_pos_xyz[0],
+        src_dist * np.cos(np.deg2rad(src_elev)) * np.sin(np.deg2rad(src_azim + head_azim)) + head_pos_xyz[1],
+        src_dist * np.sin(np.deg2rad(src_elev)) + head_pos_xyz[2],
+    ])
+    if verbose:
+        print("[get_brir] head_pos: {}, src_pos: {}, room_dim: {}".format(
+            head_pos_xyz.tolist(),
+            src_pos_xyz.tolist(),
+            room_dim_xyz.tolist()))
+    t0 = time.time()
+
+    h_out, lead_zeros = room_impulse_hrtf(
+        src_loc=src_pos_xyz,
+        head_cent=head_pos_xyz,
+        head_azim=-head_azim, # `room_impulse_hrtf` convention is positive azimuth = clockwise
+        walls=room_dim_xyz,
+        wtypes=room_materials,
+        sr=sr,
+        c=c,
+        dur=dur,
+        use_m_sym=use_m_sym,
+        use_log_distance=use_log_distance,
+        use_jitter=use_jitter,
+        use_highpass=use_highpass)
+    if verbose:
+        print(f'[get_brir] time elapsed: {time.time() - t0} seconds')
+    if incorporate_lead_zeros:
+        lead_zeros = int(np.round(lead_zeros))
+        print(f'[get_brir] incorporated {lead_zeros} leading zeros')
+        if lead_zeros >= 0:
+            h_out = np.pad(h_out, ((lead_zeros, 0), (0, 0)))
+            brir = h_out[:int(dur * sr)]
+        else:
+            h_out = np.pad(h_out, ((0, -lead_zeros), (0, 0)))
+            brir = h_out[-lead_zeros:]
+    else:
+        brir = h_out
+    return brir

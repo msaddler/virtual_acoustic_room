@@ -21,36 +21,26 @@ def acoeff_hrtf(material, freq=[125, 250, 500, 1000, 2000, 4000]):
         [0.28, 0.22, 0.17, 0.09, 0.10, 0.11],  # 6  : Plywood
         [0.36, 0.44, 0.31, 0.29, 0.39, 0.25],  # 7  : Concrete block, coarse
         [0.14, 0.35, 0.55, 0.72, 0.70, 0.65],  # 8  : Heavyweight drapery
-        # 9  : Fiberglass wall treatment, 1 in
-        [0.08, 0.32, 0.99, 0.76, 0.34, 0.12],
-        # 10 : Fiberglass wall treatment, 7 in
-        [0.86, 0.99, 0.99, 0.99, 0.99, 0.99],
-        # 11 : Wood panelling on glass fiber blanket
-        [0.40, 0.90, 0.80, 0.50, 0.40, 0.30],
+        [0.08, 0.32, 0.99, 0.76, 0.34, 0.12],  # 9  : Fiberglass wall treatment, 1 in
+        [0.86, 0.99, 0.99, 0.99, 0.99, 0.99],  # 10 : Fiberglass wall treatment, 7 in
+        [0.40, 0.90, 0.80, 0.50, 0.40, 0.30],  # 11 : Wood panelling on glass fiber blanket
     ]
     floors = [
         [0.04, 0.04, 0.07, 0.06, 0.06, 0.07],  # 12 : Wood parquet on concrete
         [0.02, 0.03, 0.03, 0.03, 0.03, 0.02],  # 13 : Linoleum
         [0.02, 0.06, 0.14, 0.37, 0.60, 0.65],  # 14 : Carpet on concrete
-        # 15 : Carpet on foam rubber padding
-        [0.08, 0.24, 0.57, 0.69, 0.71, 0.73],
+        [0.08, 0.24, 0.57, 0.69, 0.71, 0.73],  # 15 : Carpet on foam rubber padding
     ]
     ceilings = [
-        # 16 : Plaster, gypsum, or lime on lath
-        [0.14, 0.10, 0.06, 0.05, 0.04, 0.03],
-        # 17 : Acoustic tiles, 0.625", 16" below ceiling
-        [0.25, 0.28, 0.46, 0.71, 0.86, 0.93],
-        # 18 : Acoustic tiles, 0.5", 16" below ceiling
-        [0.52, 0.37, 0.50, 0.69, 0.79, 0.78],
-        # 19 : Acoustic tiles, 0.5" cemented to ceiling
-        [0.10, 0.22, 0.61, 0.66, 0.74, 0.72],
-        # 20 : Highly absorptive panels, 1", 16" below ceiling
-        [0.58, 0.88, 0.75, 0.99, 1.00, 0.96],
+        [0.14, 0.10, 0.06, 0.05, 0.04, 0.03],  # 16 : Plaster, gypsum, or lime on lath
+        [0.25, 0.28, 0.46, 0.71, 0.86, 0.93],  # 17 : Acoustic tiles, 0.625", 16" below ceiling
+        [0.52, 0.37, 0.50, 0.69, 0.79, 0.78],  # 18 : Acoustic tiles, 0.5", 16" below ceiling
+        [0.10, 0.22, 0.61, 0.66, 0.74, 0.72],  # 19 : Acoustic tiles, 0.5" cemented to ceiling
+        [0.58, 0.88, 0.75, 0.99, 1.00, 0.96],  # 20 : Highly absorptive panels, 1", 16" below ceiling
     ]
     others = [
         [0.19, 0.37, 0.56, 0.67, 0.61, 0.59],  # 21 : Upholstered seats
-        # 22 : Audience in upholstered seats
-        [0.39, 0.57, 0.80, 0.94, 0.92, 0.87],
+        [0.39, 0.57, 0.80, 0.94, 0.92, 0.87],  # 22 : Audience in upholstered seats
         [0.11, 0.26, 0.60, 0.69, 0.92, 0.99],  # 23 : Grass
         [0.15, 0.25, 0.40, 0.55, 0.60, 0.60],  # 24 : Soil
         [0.01, 0.01, 0.01, 0.02, 0.02, 0.03],  # 25 : Water surface
@@ -146,27 +136,27 @@ def shapedfilter_hrtf(sdelay, freq, gain, sr, ctap, ctap2):
 
 
 def impulse_generate_hrtf(
-        h,
-        head_cent,
-        head_azim,
-        s_locations,
-        s_reflections,
-        m_locs,
-        m_locs_xyz,
-        m_locs_xyz_logdist,
-        m_files,
-        m_delay,
-        use_m_sym,
-        sr,
-        c,
-        ntaps,
-        use_log_distance,
-        ctap,
-        ctap2,
-        fgains,
-        nfreq,
-        lead_zeros,
-        use_jitter):
+        h=None,
+        head_cent=None,
+        head_azim=None,
+        s_locations=None,
+        s_reflections=None,
+        m_locs=None,
+        m_locs_xyz=None,
+        m_locs_xyz_logdist=None,
+        m_files=None,
+        m_delay=None,
+        sr=None,
+        c=None,
+        ntaps=None,
+        ctap=None,
+        ctap2=None,
+        fgains=None,
+        nfreq=None,
+        lead_zeros=None,
+        use_m_sym=None,
+        use_log_distance=None,
+        use_jitter=None):
     """
     """
     jitter_reflects = 5
@@ -365,12 +355,12 @@ def room_impulse_hrtf(
         src_loc=[5, 5, 5],
         head_cent=[2, 2, 2],
         head_azim=0,
-        use_m_sym=True,
         walls=[10, 10, 10],
         wtypes=[3, 3, 3, 3, 3, 3],
         sr=44100,
         c=344.5,
         dur=0.5,
+        use_m_sym=True,
         use_log_distance=False,
         use_jitter=True,
         use_highpass=True):
@@ -523,61 +513,60 @@ def room_impulse_hrtf(
                               :] = s_refs[slice(0, m), :]
                 # Get impulse response contributions
                 h, s_locations = impulse_generate_hrtf(
-                    h,
-                    head_cent,
-                    head_azim,
-                    s_locations,
-                    s_reflections,
-                    m_locs,
-                    m_locs_xyz,
-                    m_locs_xyz_logdist,
-                    m_files,
-                    m_delay,
-                    use_m_sym,
-                    sr,
-                    c,
-                    ntaps,
-                    use_log_distance,
-                    ctap,
-                    ctap2,
-                    fgains,
-                    nfreq,
-                    lead_zeros,
-                    use_jitter)
+                    h=h,
+                    head_cent=head_cent,
+                    head_azim=head_azim,
+                    s_locations=s_locations,
+                    s_reflections=s_reflections,
+                    m_locs=m_locs,
+                    m_locs_xyz=m_locs_xyz,
+                    m_locs_xyz_logdist=m_locs_xyz_logdist,
+                    m_files=m_files,
+                    m_delay=m_delay,
+                    sr=sr,
+                    c=c,
+                    ntaps=ntaps,
+                    ctap=ctap,
+                    ctap2=ctap2,
+                    fgains=fgains,
+                    nfreq=nfreq,
+                    lead_zeros=lead_zeros,
+                    use_m_sym=use_m_sym,
+                    use_log_distance=use_log_distance,
+                    use_jitter=use_jitter)
                 loc_num = 0  # Reset loc_num counter and continue
                 s_locs = s_locs[slice(m, s_locs.shape[0]), :]
                 s_refs = s_refs[slice(m, s_refs.shape[0]), :]
 
             s_locations[slice(loc_num, loc_num + s_locs.shape[0]), :] = s_locs
-            s_reflections[slice(loc_num, loc_num +
-                                s_refs.shape[0]), :] = s_refs
+            s_reflections[slice(loc_num, loc_num + s_refs.shape[0]), :] = s_refs
             loc_num = loc_num + s_locs.shape[0]
 
     # When all locations have been generated, process the final ones
     s_locations = s_locations[0:loc_num, :]
     s_reflections = s_reflections[0:loc_num, :]
     h, s_locations = impulse_generate_hrtf(
-        h,
-        head_cent,
-        head_azim,
-        s_locations,
-        s_reflections,
-        m_locs,
-        m_locs_xyz,
-        m_locs_xyz_logdist,
-        m_files,
-        m_delay,
-        use_m_sym,
-        sr,
-        c,
-        ntaps,
-        use_log_distance,
-        ctap,
-        ctap2,
-        fgains,
-        nfreq,
-        lead_zeros,
-        use_jitter)
+        h=h,
+        head_cent=head_cent,
+        head_azim=head_azim,
+        s_locations=s_locations,
+        s_reflections=s_reflections,
+        m_locs=m_locs,
+        m_locs_xyz=m_locs_xyz,
+        m_locs_xyz_logdist=m_locs_xyz_logdist,
+        m_files=m_files,
+        m_delay=m_delay,
+        sr=sr,
+        c=c,
+        ntaps=ntaps,
+        ctap=ctap,
+        ctap2=ctap2,
+        fgains=fgains,
+        nfreq=nfreq,
+        lead_zeros=lead_zeros,
+        use_m_sym=use_m_sym,
+        use_log_distance=use_log_distance,
+        use_jitter=use_jitter)
 
     """
     Part III: Finalize output

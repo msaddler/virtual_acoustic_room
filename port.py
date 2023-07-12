@@ -447,21 +447,6 @@ def room_impulse_hrtf(
     src_loc = np.array(src_loc, dtype=float)
     head_cent = np.array(head_cent, dtype=float)
     head_azim = np.array(head_azim, dtype=float)
-    if hrtf_firs is None:
-        hrtf_firs = []
-        hrtf_filenames = scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file']
-        for fn in hrtf_filenames:
-            hrtf, sr_hrtf = sf.read(fn.replace('\\', '/').replace(' ', ''))
-            assert sr == sr_hrtf, "sampling rate does not match HRTF"
-            hrtf_firs.append(hrtf)
-        hrtf_firs = np.array(hrtf_firs, dtype=float)
-        print(f"Loaded KEMAR `hrtf_firs` (Gardner & Martin, 1995): {hrtf_firs.shape}")
-        assert use_hrtf_symmetry, "KEMAR HRTFs require use_hrtf_symmetry=True"
-    if hrtf_locs is None:
-        hrtf_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
-        hrtf_locs = np.array(hrtf_locs, dtype=float)
-        print(f"Loaded KEMAR `hrtf_locs` (Gardner & Martin, 1995): {hrtf_locs.shape}")
-        assert use_hrtf_symmetry, "KEMAR HRTFs require use_hrtf_symmetry=True"
     assert hrtf_locs.shape[0] == hrtf_firs.shape[0], "hrtf_locs.shape[0] != hrtf_firs.shape[0]"
     hrtf_delay = (np.sqrt(np.sum(np.square(src_loc - head_cent))) /
                   c) * np.ones((hrtf_locs.shape[0],))
@@ -707,6 +692,19 @@ def get_brir(
     Main function to generate binaural room impulse response (BRIR) from
     a room description, a listener position, and a source position.
     """
+    if (hrtf_locs is None) or (hrtf_firs is None):
+        hrtf_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
+        hrtf_locs = np.array(hrtf_locs, dtype=float)
+        hrtf_firs = []
+        hrtf_filenames = scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file']
+        for fn in hrtf_filenames:
+            hrtf, sr_hrtf = sf.read(fn.replace('\\', '/').replace(' ', ''))
+            assert sr == sr_hrtf, "sampling rate does not match HRTF"
+            hrtf_firs.append(hrtf)
+        hrtf_firs = np.array(hrtf_firs, dtype=float)
+        if verbose:
+            print(f"Loaded KEMAR HRTFs (Gardner & Martin, 1995 JASA): {hrtf_firs.shape}")
+        assert use_hrtf_symmetry, "KEMAR HRTFs require use_hrtf_symmetry=True"
     room_materials = np.array(room_materials)
     msg = "room_materials shape: [wall_x0, wall_x, wall_y0, wall_y, floor, ceiling]"
     assert room_materials.shape == (6,), msg

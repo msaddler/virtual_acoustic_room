@@ -141,8 +141,8 @@ def shapedfilter_hrtf(sdelay, freq, gain, sr, ctap, ctap2):
     # Design the non-integer delay filter
     x = np.ones((1, ntaps))
     x[0, 0] = 0
-    x = np.matmul(np.ones(sdelay.shape), np.arange(-N, N +
-                  1).reshape((1, -1))) - np.matmul(sdelay, x)
+    x = np.matmul(np.ones(sdelay.shape),
+                  np.arange(-N, N + 1).reshape((1, -1))) - np.matmul(sdelay, x)
     h = 0.5 * fc * (1 + np.cos(np.pi * x / N)) * np.sinc(fc * x)
     freq = freq.reshape((-1))  # Ensure freq is a vector
     if ctap2 > 1:
@@ -204,6 +204,7 @@ def func_to_parallelize(
         hrtf_locs=None,
         hrtf_firs=None):
     """
+    Contents of the parfor loop within `impulse_generate_hrtf.m`
     """
     hrtf_temp = None
     IDX_l = nearest_hrtf_loc == l
@@ -214,8 +215,7 @@ def func_to_parallelize(
         # Treat non-flipped sources
         if IDX_noflip.sum() > 0:
             # Get sample delays to the measured location
-            thit = ctap + ctap2 - lead_zeros + \
-                hrtf_delay[l] + (rel_dist[IDX_noflip] * sr / c)
+            thit = ctap + ctap2 - lead_zeros + hrtf_delay[l] + (rel_dist[IDX_noflip] * sr / c)
             ihit = np.floor(thit)
             fhit = thit - ihit
             gains_noflip = gains[IDX_noflip, :]
@@ -227,17 +227,13 @@ def func_to_parallelize(
             v = ihit <= ntaps + ctap + ctap2
             if v.sum() > 0:
                 # Initialize temporary impulse response vector
-                ht = np.zeros(
-                    (h.shape[0] + ctap + 1 + ctap2 + 1, 1), dtype=float)
+                ht = np.zeros((h.shape[0] + ctap + 1 + ctap2 + 1, 1), dtype=float)
                 # Indices into ht. Each row corresonds to one source image location, with the center
                 # determined by ihit. Within a row, there are (2 * ctap - 1) + (2 * ctap2 - 1) - 1 values
                 # that account for non-integer dela, fhit, and for frequency-dependent wall reflections /
                 # sphere diffraction
-                ht_ind = ihit[v].reshape(-1, 1) * \
-                    np.ones((1, 2 * ctap - 1 + 2 * ctap2 - 1 - 1))
-                ht_ind = ht_ind + \
-                    np.arange(-ctap - ctap2 + 1 + 1, ctap +
-                                ctap2 - 1).reshape((1, -1))
+                ht_ind = ihit[v].reshape(-1, 1) * np.ones((1, 2 * ctap - 1 + 2 * ctap2 - 1 - 1))
+                ht_ind = ht_ind + np.arange(-ctap - ctap2 + 1 + 1, ctap + ctap2 - 1).reshape((1, -1))
                 ht_ind = ht_ind.astype(int)
                 # For each source location, determine the impulse response (generate filter to
                 # incorporate frequency gains, non-integer delay and scattering off rigid sphere
@@ -254,17 +250,14 @@ def func_to_parallelize(
                 # Incorporate HRTF impulse response and add into overall impulse response matrix
                 hrtf = hrtf_firs[l]
                 new_vals = np.stack([
-                    scipy.signal.convolve(
-                        ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
-                    scipy.signal.convolve(
-                        ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
+                    scipy.signal.convolve(ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
+                    scipy.signal.convolve(ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
                 ], axis=1)
                 hrtf_temp = hrtf_temp + new_vals[:hrtf_temp.shape[0]]
         # Treat flipped sources
         if IDX_flip.sum() > 0:
             # Get sample delays to the measured location
-            thit = ctap + ctap2 - lead_zeros + \
-                hrtf_delay[l] + (rel_dist[IDX_flip] * sr / c)
+            thit = ctap + ctap2 - lead_zeros + hrtf_delay[l] + (rel_dist[IDX_flip] * sr / c)
             ihit = np.floor(thit)
             fhit = thit - ihit
             gains_flip = gains[IDX_flip, :]
@@ -276,17 +269,13 @@ def func_to_parallelize(
             v = ihit <= ntaps + ctap + ctap2
             if v.sum() > 0:
                 # Initialize temporary impulse response vector
-                ht = np.zeros(
-                    (h.shape[0] + ctap + 1 + ctap2 + 1, 1), dtype=float)
+                ht = np.zeros((h.shape[0] + ctap + 1 + ctap2 + 1, 1), dtype=float)
                 # Indices into ht. Each row corresonds to one source image location, with the center
                 # determined by ihit. Within a row, there are (2 * ctap - 1) + (2 * ctap2 - 1) - 1 values
                 # that account for non-integer dela, fhit, and for frequency-dependent wall reflections /
                 # sphere diffraction
-                ht_ind = ihit[v].reshape(-1, 1) * \
-                    np.ones((1, 2 * ctap - 1 + 2 * ctap2 - 1 - 1))
-                ht_ind = ht_ind + \
-                    np.arange(-ctap - ctap2 + 1 + 1, ctap +
-                                ctap2 - 1).reshape((1, -1))
+                ht_ind = ihit[v].reshape(-1, 1) * np.ones((1, 2 * ctap - 1 + 2 * ctap2 - 1 - 1))
+                ht_ind = ht_ind + np.arange(-ctap - ctap2 + 1 + 1, ctap + ctap2 - 1).reshape((1, -1))
                 ht_ind = ht_ind.astype(int)
                 # For each source location, determine the impulse response (generate filter to
                 # incorporate frequency gains, non-integer delay and scattering off rigid sphere
@@ -303,10 +292,8 @@ def func_to_parallelize(
                 # Incorporate HRTF impulse response and add into overall impulse response matrix
                 hrtf = hrtf_firs[l]
                 new_vals = np.stack([
-                    scipy.signal.convolve(
-                        ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
-                    scipy.signal.convolve(
-                        ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
+                    scipy.signal.convolve(ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
+                    scipy.signal.convolve(ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
                 ], axis=1)
                 hrtf_temp = hrtf_temp + new_vals[:hrtf_temp.shape[0]]
     return hrtf_temp
@@ -347,9 +334,9 @@ def impulse_generate_hrtf(
     # through each wall) for each source location.
     gains = np.ones((s_locations.shape[0], nfreq.shape[0]), dtype=float)
     for itr_wall in range(6):
-        gains = gains * \
-            np.power(fgains[itr_wall:itr_wall + 1, :],
-                     s_reflections[:, itr_wall:itr_wall + 1])
+        gains = gains * np.power(
+            fgains[itr_wall:itr_wall + 1, :],
+            s_reflections[:, itr_wall:itr_wall + 1])
     # If use_hrtf_symmetry is active, convert 180° to 360° sources to 0° to 180° sources
     s_locations_relh = s_locations - head_cent.reshape((1, -1))
     s_locations_pol = np.zeros_like(s_locations)
@@ -429,7 +416,10 @@ def impulse_generate_hrtf(
         s_locations_pol=s_locations_pol,
         hrtf_locs=hrtf_locs,
         hrtf_firs=hrtf_firs)
-    list_hrtf_temp = pool.map(f, range(hrtf_locs.shape[0]))
+    if pool is None:
+        list_hrtf_temp = [f(_) for _ in range(hrtf_locs.shape[0])]
+    else:
+        list_hrtf_temp = pool.map(f, range(hrtf_locs.shape[0]))
     h = h + np.sum([_ for _ in list_hrtf_temp if _ is not None], axis=0)
     return h, s_locations
 
@@ -465,11 +455,13 @@ def room_impulse_hrtf(
             hrtf_firs.append(hrtf)
         hrtf_firs = np.array(hrtf_firs, dtype=float)
         print(f"Loaded KEMAR `hrtf_firs` (Gardner & Martin, 1995): {hrtf_firs.shape}")
+        assert use_hrtf_symmetry, "KEMAR HRTFs require use_hrtf_symmetry=True"
     if hrtf_locs is None:
         hrtf_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
         hrtf_locs = np.array(hrtf_locs, dtype=float)
         print(f"Loaded KEMAR `hrtf_locs` (Gardner & Martin, 1995): {hrtf_locs.shape}")
-    assert hrtf_firs.shape[0] == hrtf_locs.shape[0]
+        assert use_hrtf_symmetry, "KEMAR HRTFs require use_hrtf_symmetry=True"
+    assert hrtf_locs.shape[0] == hrtf_firs.shape[0], "hrtf_locs.shape[0] != hrtf_firs.shape[0]"
     hrtf_delay = (np.sqrt(np.sum(np.square(src_loc - head_cent))) /
                   c) * np.ones((hrtf_locs.shape[0],))
 
@@ -685,7 +677,6 @@ def get_brir(
         src_azim=0,
         src_elev=0,
         src_dist=1.4,
-        buffer_pos=0,
         sr=44100,
         c=344.5,
         dur=0.5,
@@ -696,6 +687,7 @@ def get_brir(
         use_jitter=True,
         use_highpass=True,
         incorporate_lead_zeros=True,
+        processes=12,
         verbose=True):
     """
     Main function to generate binaural room impulse response (BRIR) from
@@ -721,7 +713,7 @@ def get_brir(
             src_pos_xyz.tolist(),
             room_dim_xyz.tolist()))
     t0 = time.time()
-    with multiprocessing.Pool(12) as pool:
+    with multiprocessing.Pool(processes=processes) as pool:
         h_out, lead_zeros = room_impulse_hrtf(
             src_loc=src_pos_xyz,
             head_cent=head_pos_xyz,

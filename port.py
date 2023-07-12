@@ -669,6 +669,17 @@ def room_impulse_hrtf(
     return hout, lead_zeros
 
 
+def is_valid_position(point, walls, buffer=0):
+    """
+    Helper function to check if a position is inside the room walls.
+    """
+    assert len(point) == len(walls)
+    for p, w in zip(point, walls):
+        if p < buffer or p > w - buffer:
+            return False
+    return True
+
+
 def get_brir(
         room_materials=[26, 26, 26, 26, 26, 26],
         room_dim_xyz=[10, 10, 3],
@@ -677,6 +688,7 @@ def get_brir(
         src_azim=0,
         src_elev=0,
         src_dist=1.4,
+        buffer=0,
         sr=44100,
         c=344.5,
         dur=0.5,
@@ -688,6 +700,7 @@ def get_brir(
         use_highpass=True,
         incorporate_lead_zeros=True,
         processes=12,
+        strict=True,
         verbose=True):
     """
     Main function to generate binaural room impulse response (BRIR) from
@@ -707,6 +720,10 @@ def get_brir(
         src_dist * np.cos(np.deg2rad(src_elev)) * np.sin(np.deg2rad(src_azim + head_azim)) + head_pos_xyz[1],
         src_dist * np.sin(np.deg2rad(src_elev)) + head_pos_xyz[2],
     ])
+    if strict:
+        assert head_azim <= 135, "head_azim > 135° causes unexpected behavior (recommended range: [0, 90])"
+        assert is_valid_position(head_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid head position"
+        assert is_valid_position(src_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid source position"
     if verbose:
         print("[get_brir] head_pos: {}, src_pos: {}, room_dim: {}".format(
             head_pos_xyz.tolist(),

@@ -116,7 +116,7 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
              src_azim=0,
              src_elev=0,
              src_dist=1,
-             buffer_pos=0,
+             buffer=0,
              sr=50000,
              dur=0.5,
              kwargs_room_impulse_hrtf={},
@@ -127,7 +127,7 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
     Main function to generate binaural room impulse response (BRIR) from
     a room description, a listener position, and a source position.
     """
-    assert head_azim >= -135, "head_azim < -135 degrees cause unexpected behavior"
+    assert head_azim <= 135, "head_azim > 135° causes unexpected behavior (recommended range: [0, 90])"
     room_materials = np.array(room_materials)
     assert room_materials.shape == (6,), "room_materials shape: [wall_x0, wall_x, wall_y0, wall_y, floor, ceiling]"
     room_dim_xyz = np.array(room_dim_xyz)
@@ -139,8 +139,8 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
         src_dist * np.cos(np.deg2rad(src_elev)) * np.sin(np.deg2rad(src_azim + head_azim)) + head_pos_xyz[1],
         src_dist * np.sin(np.deg2rad(src_elev)) + head_pos_xyz[2],
     ])
-    assert is_valid_position(head_pos_xyz, room_dim_xyz, buffer=buffer_pos), "Invalid head position"
-    assert is_valid_position(src_pos_xyz, room_dim_xyz, buffer=buffer_pos), "Invalid source position"
+    assert is_valid_position(head_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid head position"
+    assert is_valid_position(src_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid source position"
     if verbose:
         print("[room simulator] head_pos: {}, src_pos: {}, room_dim: {}".format(
             head_pos_xyz.tolist(),
@@ -240,7 +240,7 @@ def sample_room_parameters(
 
 def sample_head_parameters(
         room_dim_xyz=[10, 10, 3],
-        buffer_pos=1.4,
+        buffer=1.4,
         range_src_elev=[-60, 60],
         range_head_azim=[0, 90],
         range_head_z=[1.2, 2.4],
@@ -248,13 +248,13 @@ def sample_head_parameters(
     """
     Helper function for randomly sampling head parameters (position and azimuth).
     """
-    min_z = buffer_pos * np.sin(np.deg2rad(np.max(np.abs(range_src_elev))))
+    min_z = buffer * np.sin(np.deg2rad(np.max(np.abs(range_src_elev))))
     min_z = max(range_head_z[0], min_z)
     max_z = min(range_head_z[1], room_dim_xyz[2] - min_z)
     assert (min_z <= max_z) and (min_z >= 0), "invalid range of z values for head position"
     head_pos_xyz = np.array([
-        np.random.uniform(low=buffer_pos, high=room_dim_xyz[0]-buffer_pos),
-        np.random.uniform(low=buffer_pos, high=room_dim_xyz[1]-buffer_pos),
+        np.random.uniform(low=buffer, high=room_dim_xyz[0]-buffer),
+        np.random.uniform(low=buffer, high=room_dim_xyz[1]-buffer),
         np.random.uniform(low=min_z, high=max_z),
     ])
     head_azim = np.random.uniform(low=range_head_azim[0], high=range_head_azim[1])

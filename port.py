@@ -205,9 +205,10 @@ def func_to_parallelize(
         hrtf_firs=None):
     """
     """
-    hrtf_temp = np.zeros_like(h)
+    hrtf_temp = None
     IDX_l = nearest_hrtf_loc == l
     if IDX_l.sum() > 0:
+        hrtf_temp = np.zeros_like(h)
         IDX_noflip = np.logical_and(IDX_l, ~flip)
         IDX_flip = np.logical_and(IDX_l, flip)
         # Treat non-flipped sources
@@ -253,9 +254,9 @@ def func_to_parallelize(
                 # Incorporate HRTF impulse response and add into overall impulse response matrix
                 hrtf = hrtf_firs[l]
                 new_vals = np.stack([
-                    scipy.signal.fftconvolve(
+                    scipy.signal.convolve(
                         ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
-                    scipy.signal.fftconvolve(
+                    scipy.signal.convolve(
                         ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
                 ], axis=1)
                 hrtf_temp = hrtf_temp + new_vals[:hrtf_temp.shape[0]]
@@ -302,9 +303,9 @@ def func_to_parallelize(
                 # Incorporate HRTF impulse response and add into overall impulse response matrix
                 hrtf = hrtf_firs[l]
                 new_vals = np.stack([
-                    scipy.signal.fftconvolve(
+                    scipy.signal.convolve(
                         ht[:h.shape[0], 0], hrtf[:, 1], mode='full'),
-                    scipy.signal.fftconvolve(
+                    scipy.signal.convolve(
                         ht[:h.shape[0], 0], hrtf[:, 0], mode='full'),
                 ], axis=1)
                 hrtf_temp = hrtf_temp + new_vals[:hrtf_temp.shape[0]]
@@ -429,8 +430,7 @@ def impulse_generate_hrtf(
         hrtf_locs=hrtf_locs,
         hrtf_firs=hrtf_firs)
     list_hrtf_temp = pool.map(f, range(hrtf_locs.shape[0]))
-    hrtf_temp = np.stack(list_hrtf_temp, axis=0)
-    h = h + hrtf_temp.sum(axis=0)
+    h = h + np.sum([_ for _ in list_hrtf_temp if _ is not None], axis=0)
     return h, s_locations
 
 

@@ -247,7 +247,7 @@ def func_to_parallelize(
         hrtf_locs=None,
         hrtf_firs=None):
     """
-    Contents of the parfor loop within `impulse_generate_hrtf.m`
+    Contents of the parfor loop `impulse_generate_hrtf.m` (line 170)
     """
     hrtf_temp = None
     IDX_l = nearest_hrtf_loc == l

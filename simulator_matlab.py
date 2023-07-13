@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import glob
 import scipy.io
 import numpy as np
 import matlab.engine
@@ -10,6 +11,8 @@ def room_impulse_hrtf(
         src_loc,
         head_center,
         head_azimuth,
+        meas_locs,
+        meas_files,
         walls,
         wtypes,
         meas_sym=1,
@@ -23,19 +26,14 @@ def room_impulse_hrtf(
         eng=None):
     """
     Python wrapper function around MATLAB function `room_impulse_hrtf.m`.
-    
-    TODO:   `meas_locs` and `meas_files` are hard-coded here, which currently
-            limits this room simulator to use a single set of measured HRTFs.
     """
-    meas_locs = eng.load('HRTFs/data_locs.mat')['locs_gardnermartin']
-    meas_files = eng.cellstr(scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file'].tolist())
     meas_delay = (np.sqrt(np.sum(np.square(src_loc - head_center))) / c_snd) * np.ones(len(meas_files))
     h_out, lead_zeros = eng.room_impulse_hrtf(
         matlab.double(src_loc.reshape([1, 3]).tolist()),
         matlab.double(head_center.reshape([1, 3]).tolist()),
         matlab.double([head_azimuth]),
-        meas_locs,
-        meas_files,
+        matlab.double(meas_locs.reshape([-1, 3]).tolist()),
+        eng.cellstr(list(meas_files)),
         matlab.double(meas_delay.reshape([len(meas_files), 1]).tolist()),
         matlab.double([meas_sym]),
         matlab.double(walls.reshape([1, 3]).tolist()),
@@ -105,11 +103,17 @@ def get_brir(room_materials=[26, 26, 26, 26, 26, 26],
             head_pos_xyz.tolist(),
             src_pos_xyz.tolist(),
             room_dim_xyz.tolist()))
+    meas_locs = np.load('kemar_hrtfs/hrtfs.npz')['hrtf_locs']
+    meas_files = []
+    for elev in np.arange(-40, 91, 10, dtype=int):
+        meas_files.extend(sorted(glob.glob(f'kemar_hrtfs/elev{elev}/*wav')))
     t0 = time.time()
     h_out, lead_zeros = room_impulse_hrtf(
         src_loc=src_pos_xyz,
         head_center=head_pos_xyz,
         head_azimuth=-head_azim, # `room_impulse_hrtf` convention is positive azimuth = clockwise
+        meas_locs=meas_locs,
+        meas_files=meas_files,
         walls=room_dim_xyz,
         wtypes=room_materials,
         meas_sym=int(use_hrtf_symmetry),

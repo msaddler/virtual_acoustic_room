@@ -2,6 +2,7 @@ import os
 import sys
 import pdb
 import time
+import glob
 import functools
 import multiprocessing
 import numpy as np
@@ -54,6 +55,47 @@ map_int_to_material = {
     32: 'Artificial with absorption higher in middle ranges',
     33: 'Artificial - absorbs more at low freqs',
 }
+
+
+def load_kemar_hrtfs(npz_filename='kemar_hrtfs/hrtfs.npz'):
+    """
+    Helper function to load KEMAR HRTFs from Gardner & Martin (1994).
+    Source: https://sound.media.mit.edu/resources/KEMAR.html
+    
+    Returns
+    -------
+    hrtf_locs (float array w/ shape [368, 3]): polar (1.4m, azim, elev)
+    hrtf_firs (float array w/ shape [368, 128, 2]): impulse responses
+    hrtf_sr (int): sampling rate of impulse responses (44100 Hz)
+    """
+    if os.path.exists(npz_filename):
+        f = np.load(npz_filename)
+        return f['hrtf_locs'], f['hrtf_firs'], f['hrtf_sr']
+    else:
+        # Azimuths measured at +/- 40° elevation do not occur at integer angles
+        azim_elev40 = np.linspace(0, 180, 56 // 2 + 1)
+        list_fn_hrtf = []
+        for elev in np.arange(-40, 91, 10, dtype=int):
+            list_fn_hrtf.extend(sorted(glob.glob(f'kemar_hrtfs/elev{elev}/*wav')))
+        hrtf_locs = []
+        hrtf_firs = []
+        for fn_hrtf in list_fn_hrtf:
+            hrtf, hrtf_sr = sf.read(fn_hrtf)
+            tmp = os.path.basename(fn_hrtf).replace('.wav', '')
+            elev, azim = [float(_) for _ in tmp.strip('Ha').split('e')]
+            if np.abs(elev) == 40:
+                azim = azim_elev40[np.argmin(np.abs(azim_elev40 - azim))]
+            hrtf_locs.append([1.4, azim, elev])
+            hrtf_firs.append(hrtf)
+        hrtf_locs = np.array(hrtf_locs)
+        hrtf_firs = np.array(hrtf_firs)
+        np.savez(
+            npz_filename,
+            hrtf_locs=hrtf_locs,
+            hrtf_firs=hrtf_firs,
+            hrtf_sr=hrtf_sr)
+        print(f'[load_kemar_hrtfs] cache file for future calls: {npz_filename}')
+    return hrtf_locs, hrtf_firs, hrtf_sr
 
 
 def acoeff_hrtf(material, freq=[125, 250, 500, 1000, 2000, 4000]):
@@ -693,18 +735,11 @@ def get_brir(
     a room description, a listener position, and a source position.
     """
     if (hrtf_locs is None) or (hrtf_firs is None):
-        hrtf_locs = scipy.io.loadmat('HRTFs/data_locs.mat')['locs_gardnermartin']
-        hrtf_locs = np.array(hrtf_locs, dtype=float)
-        hrtf_firs = []
-        hrtf_filenames = scipy.io.loadmat('HRTFs/file_names.mat')['gardnermartin_file']
-        for fn in hrtf_filenames:
-            hrtf, sr_hrtf = sf.read(fn.replace('\\', '/').replace(' ', ''))
-            assert sr == sr_hrtf, "sampling rate does not match HRTF"
-            hrtf_firs.append(hrtf)
-        hrtf_firs = np.array(hrtf_firs, dtype=float)
+        hrtf_locs, hrtf_firs, hrtf_sr = load_kemar_hrtfs()
+        assert sr == hrtf_sr, "sampling rate does not match kemar_hrtfs"
+        assert use_hrtf_symmetry, "kemar_hrtfs require use_hrtf_symmetry=True"
         if verbose:
-            print(f"Loaded KEMAR HRTFs (Gardner & Martin, 1995 JASA): {hrtf_firs.shape}")
-        assert use_hrtf_symmetry, "KEMAR HRTFs require use_hrtf_symmetry=True"
+            print(f"[get_brir] loaded kemar_hrtfs (Gardner & Martin, 1994): {hrtf_firs.shape}")
     room_materials = np.array(room_materials)
     msg = "room_materials shape: [wall_x0, wall_x, wall_y0, wall_y, floor, ceiling]"
     assert room_materials.shape == (6,), msg

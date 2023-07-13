@@ -224,7 +224,7 @@ def shapedfilter_hrtf(sdelay, freq, gain, sr, ctap, ctap2):
     else:
         # Scale impulse response only if wall reflections are
         # frequency-independent and sphere is not present
-        hout = h * np.matmul(gain[:, 0], np.ones(h[0:1, :].shape))
+        hout = h * np.matmul(gain[:, 0:1], np.ones(h[0:1, :].shape))
     return hout
 
 
@@ -461,10 +461,10 @@ def impulse_generate_hrtf(
     list_loc = [_ for _ in range(hrtf_locs.shape[0]) if _ in nearest_hrtf_loc]
     if verbose > 1:
         print(f"... processing {len(list_loc)} unique source locations")
-    if pool is None:
-        list_hrtf_temp = [f(_) for _ in list_loc]
-    else:
+    if pool is not None:
         list_hrtf_temp = pool.map(f, list_loc)
+    else:
+        list_hrtf_temp = [f(_) for _ in list_loc]
     h = h + np.sum(list_hrtf_temp, axis=0)
     return h, s_locations
 

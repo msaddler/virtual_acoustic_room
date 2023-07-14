@@ -808,7 +808,7 @@ def sample_room_parameters(
         p_outdoor_wall=0.25,
         range_room_x=[3, 30],
         range_room_y=[3, 30],
-        range_room_z=[2.5, 10],
+        range_room_z=[2.2, 10],
         list_material_outdoor_floor=[1, 7, 23, 24, 25],
         list_material_outdoor_wall=[1, 2, 3, 4, 5, 6, 7, 23, 24],
         list_material_indoor_floor=[1, 2, 4, 6, 12, 13, 14, 15],
@@ -854,12 +854,12 @@ def sample_room_parameters(
         'room_materials': list(material_wall) + [material_floor, material_ceiling],
         'room_dim_xyz': [x_len, y_len, z_len],
         'is_outdoor': is_outdoor,
-        'material_wall_xmin': map_int_to_material[material_wall[0]],
-        'material_wall_xmax': map_int_to_material[material_wall[1]],
-        'material_wall_ymin': map_int_to_material[material_wall[2]],
-        'material_wall_ymax': map_int_to_material[material_wall[3]],
-        'material_wall_zmin': map_int_to_material[material_floor],
-        'material_wall_zmax': map_int_to_material[material_ceiling],
+        'material_x0': map_int_to_material[material_wall[0]],
+        'material_x1': map_int_to_material[material_wall[1]],
+        'material_y0': map_int_to_material[material_wall[2]],
+        'material_y1': map_int_to_material[material_wall[3]],
+        'material_z0': map_int_to_material[material_floor],
+        'material_z1': map_int_to_material[material_ceiling],
     }
     if verbose:
         print(f"[sample_room_parameters]")
@@ -869,18 +869,19 @@ def sample_room_parameters(
 
 
 def sample_head_parameters(
-        room_dim_xyz=[10, 10, 3],
-        buffer=1.4,
+        room_dim_xyz=[3, 3, 2.2],
+        buffer=1.45,
         range_src_elev=[-40, 60],
         range_head_azim=[0, 90],
-        range_head_z=[1.2, 2.4],
+        range_head_z=[0, 2],
         verbose=True):
     """
     Helper function for randomly sampling head parameters (position and azimuth).
     """
-    min_z = buffer * np.sin(np.deg2rad(np.max(np.abs(range_src_elev))))
-    min_z = max(range_head_z[0], min_z)
-    max_z = min(range_head_z[1], room_dim_xyz[2] - min_z)
+    assert room_dim_xyz[0] >= 2 * buffer, "invalid range of x values for head position"
+    assert room_dim_xyz[1] >= 2 * buffer, "invalid range of y values for head position"
+    min_z = max(range_head_z[0], buffer * np.sin(np.deg2rad(-range_src_elev[0])))
+    max_z = min(range_head_z[1], room_dim_xyz[2] - buffer * np.sin(np.deg2rad(range_src_elev[1])))
     assert (min_z <= max_z) and (min_z >= 0), "invalid range of z values for head position"
     head_pos_xyz = np.array([
         np.random.uniform(low=buffer, high=room_dim_xyz[0]-buffer),
@@ -893,7 +894,11 @@ def sample_head_parameters(
         'head_azim': head_azim,
     }
     if verbose:
-        print(f"[sample_head_parameters] (head_z sampled uniformly from {[min_z, max_z]})")
+        print(f"[sample_head_parameters]")
+        print(f"|__ head_pos_x sampled uniformly from {[buffer, room_dim_xyz[0]-buffer]})")
+        print(f"|__ head_pos_y sampled uniformly from {[buffer, room_dim_xyz[1]-buffer]})")
+        print(f"|__ head_pos_z sampled uniformly from {[min_z, max_z]})")
+        print(f"|__ head_azim sampled uniformly from {range_head_azim})")
         for k in head_parameters.keys():
             print(f"|__ {k}: {head_parameters[k]}")
     return head_parameters

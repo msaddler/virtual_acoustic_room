@@ -791,7 +791,8 @@ def get_brir(
         print(f'[get_brir] time elapsed: {time.time() - t0} seconds')
     if incorporate_lead_zeros:
         lead_zeros = int(np.round(lead_zeros))
-        print(f'[get_brir] incorporated {lead_zeros} leading zeros')
+        if verbose:
+            print(f'[get_brir] incorporated {lead_zeros} leading zeros')
         if lead_zeros >= 0:
             h_out = np.pad(h_out, ((lead_zeros, 0), (0, 0)))
             brir = h_out[:int(dur * sr)]

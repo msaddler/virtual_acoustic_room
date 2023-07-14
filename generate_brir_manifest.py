@@ -152,6 +152,7 @@ def get_df_brir(
     """
     """
     list_d = []
+    index_brir = 0
     for src_dist in list_src_dst:
         for src_azim in list_src_azim:
             for src_elev in list_src_elev:
@@ -178,6 +179,7 @@ def get_df_brir(
                 assert simulator.is_valid_position(head_pos_xyz, dfi_room.room_dim_xyz, buffer=0)
                 assert simulator.is_valid_position(src_pos_xyz, dfi_room.room_dim_xyz, buffer=0)
                 d = {
+                    'index_brir': index_brir,
                     'index_room': dfi_room.index_room,
                     'room_materials': dfi_room.room_materials,
                     'room_dim_xyz': dfi_room.room_dim_xyz,
@@ -197,6 +199,7 @@ def get_df_brir(
                     'incorporate_lead_zeros': True,
                 }
                 list_d.append(d)
+                index_brir = index_brir + 1
     df_brir = pd.DataFrame(list_d)
     return df_brir
 

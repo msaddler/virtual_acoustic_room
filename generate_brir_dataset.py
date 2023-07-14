@@ -1,10 +1,25 @@
 import os
 import sys
+import time
+import resource
 import h5py
 import numpy as np
 import pandas as pd
 
 import simulator
+
+
+def get_display_str(itr, n_itr, n_skip=0, t_start=None):
+    """
+    """
+    disp_str = '| example: {:08d} of {:08d} |'.format(itr, n_itr)
+    disp_str += ' mem: {:06.3f} GB |'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 / 1024)
+    if t_start is not None:
+        time_per_signal = (time.time() - t_start) / (itr + 1 - n_skip) # Seconds per signal
+        time_remaining = (n_itr - itr) * time_per_signal / 60.0 # Estimated minutes remaining
+        disp_str += ' time_per_example: {:06.2f} sec |'.format(time_per_signal)
+        disp_str += ' time_remaining: {:06.0f} min |'.format(time_remaining)
+    return disp_str
 
 
 def main(df, fn, processes=8):
@@ -27,14 +42,16 @@ def main(df, fn, processes=8):
         print(f"|__ {k}: {df.iloc[0][k]}")
     print(f"[generate_bir_dataset] {fn}")
     with h5py.File(fn, 'r+') as f:
+        n_skip = 0
+        t_start = time.time()
         for itr in range(N):
-            print(f"Generating BRIR {itr} of {N}")
             dfi = df.iloc[itr]
             assert dfi.index_brir == itr
             if f['sr'][itr] == 0:
                 kwargs_get_brir = dict(dfi)
                 index_brir = kwargs_get_brir.pop('index_brir')
                 index_room = kwargs_get_brir.pop('index_room')
+                np.random.seed((index_room * N) + index_brir)
                 brir = simulator.get_brir(
                     **kwargs_get_brir,
                     hrtf_locs=hrtf_locs,
@@ -49,18 +66,23 @@ def main(df, fn, processes=8):
                 f['src_azim'][itr] = dfi.src_azim
                 f['src_elev'][itr] = dfi.src_elev
                 f['sr'][itr] = dfi.sr
+                print(get_display_str(itr, n_itr=N, n_skip=n_skip, t_start=t_start))
             else:
-                print(f"... skipped index {itr} (already exists)")
+                n_skip = n_skip + 1
     print(f"[END]: {fn}")
     return
 
 
 if __name__ == "__main__":
+    index_room = int(sys.argv[1])
     fn_manifest_brir = "/om2/user/msaddler/spatial_audio_pipeline/assets/brir/v00/manifest_brir.pdpkl"
     df_manifest_brir = pd.read_pickle(fn_manifest_brir)
-    index_room = 0
     df = df_manifest_brir[df_manifest_brir.index_room == index_room]
     assert len(df) > 0, f"Found no matching BRIRs for index_room={index_room}"
-    
     fn = os.path.join(os.path.dirname(fn_manifest_brir), 'room{:04.0f}.hdf5'.format(index_room))
-    main(df, fn, processes=8)
+    if 'SLURM_CPUS_ON_NODE' in os.environ:
+        processes = int(os.environ['SLURM_CPUS_ON_NODE'])
+        print(f'Set processes=SLURM_CPUS_ON_NODE={processes}')
+    else:
+        processes = 8
+    main(df, fn, processes=processes)

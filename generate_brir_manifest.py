@@ -150,6 +150,8 @@ def get_df_brir(
         list_src_azim=np.arange(0, 360, 5),
         list_src_elev=np.arange(-40, 61, 10)):
     """
+    Returns dataframe describing all BRIRs for a given room and head position
+    (generates all combinations of source distance, azimuth, and elevation).
     """
     list_d = []
     index_brir = 0
@@ -157,6 +159,7 @@ def get_df_brir(
         for src_azim in list_src_azim:
             for src_elev in list_src_elev:
                 if src_dist is None:
+                    # If distance is None, sample distance uniformly between 1m and wall
                     src_dist_to_wall = distance_to_wall(
                         room_dim_xyz=dfi_room.room_dim_xyz,
                         head_pos_xyz=dfi_room.head_pos_xyz,
@@ -211,6 +214,10 @@ def main(
         list_src_dist=[1.4, None],
         processes=20):
     """
+    Main function to randomly sample a set of rooms and BRIRs within rooms.
+    Writes a dataframe of rooms (describing all rooms and head positions) and
+    a manifest of BRIRs (describing all rooms, head positions, and source
+    positions) to manifest files.
     """
     print(f"Sampling {n_room} rooms / head positions")
     list_df_room = []

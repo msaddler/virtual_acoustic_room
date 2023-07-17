@@ -11,6 +11,7 @@ import simulator
 
 def get_display_str(itr, n_itr, n_skip=0, t_start=None):
     """
+    Returns display string to print BRIR generation time and memory usage
     """
     disp_str = '| example: {:08d} of {:08d} |'.format(itr, n_itr)
     disp_str += ' mem: {:06.3f} GB |'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 / 1024)
@@ -23,6 +24,10 @@ def get_display_str(itr, n_itr, n_skip=0, t_start=None):
 
 
 def main(df, fn, processes=8):
+    """
+    Main function for iterating over manifest in parallel, generating BRIRs,
+    and writing outputs to hdf5 files
+    """
     N = len(df)
     sr = df.iloc[0].sr
     dur = df.iloc[0].dur

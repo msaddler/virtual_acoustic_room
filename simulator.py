@@ -100,7 +100,7 @@ def load_kemar_hrtfs(npz_filename='kemar_hrtfs/hrtfs.npz'):
 
 def acoeff_hrtf(material, freq=[125, 250, 500, 1000, 2000, 4000]):
     """
-    Python implementation of `acoeff_hrtf.m` by msaddler (2023/07)
+    Python implementation of `acoeff_hrtf.m` by msaddler (2023/07).
     """
     freq = np.array(freq, dtype=float)
     freqtable = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
@@ -174,7 +174,7 @@ def acoeff_hrtf(material, freq=[125, 250, 500, 1000, 2000, 4000]):
 
 def shapedfilter_hrtf(sdelay, freq, gain, sr, ctap, ctap2):
     """
-    Python implementation of `shapedfilter_hrtf.m` by msaddler (2023/07)
+    Python implementation of `shapedfilter_hrtf.m` by msaddler (2023/07).
     """
     sdelay = sdelay.reshape((-1, 1))  # Ensure sdelay is an M x 1 matrix
     assert np.all(sdelay >= 0), "The sample delay must be positive"
@@ -247,7 +247,7 @@ def func_to_parallelize(
         hrtf_locs=None,
         hrtf_firs=None):
     """
-    Contents of the parfor loop `impulse_generate_hrtf.m` (line 170)
+    Contents of the parfor loop in `impulse_generate_hrtf.m` (line 170).
     """
     hrtf_temp = np.zeros_like(h)
     IDX_loc = nearest_hrtf_loc == itr_loc
@@ -365,7 +365,7 @@ def impulse_generate_hrtf(
         pool=None,
         verbose=True):
     """
-    Python implementation of `impulse_generate_hrtf.m` by msaddler (2023/07)
+    Python implementation of `impulse_generate_hrtf.m` by msaddler (2023/07).
     """
     jitter_reflects = 5
 
@@ -487,7 +487,7 @@ def room_impulse_hrtf(
         pool=None,
         verbose=True):
     """
-    Python implementation of `room_impulse_hrtf.m` by msaddler (2023/07)
+    Python implementation of `room_impulse_hrtf.m` by msaddler (2023/07).
     """
     src_loc = np.array(src_loc, dtype=float)
     head_cent = np.array(head_cent, dtype=float)

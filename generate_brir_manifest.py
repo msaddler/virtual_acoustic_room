@@ -254,19 +254,52 @@ def mit_46_1004(
         list_src_dist=[1.4, 2.0]):
     """
     Build BRIR manifests for McDermott Lab speaker array room.
+    
+    The four distinct "rooms" correspond to four different head azimuths.
+    However -- because head azimuth values outside of [0, 90] cause bugs in
+    the room simulator,the head azimuth is fixed at 0 degrees (relative to
+    the +x axis) and the entire room is rotated instead. Thus the four rooms
+    correspond to the origin being in four distinct corners of the room:
+    
+    3=====2  Wall material between origin 3 and 2: painted concrete blocks
+    |  **\|
+    |  H *|  H = head position (surrounded by semi-circular loudspeaker array)
+    |  **/|
+    |     |
+    0-----1  --(+x axis when the origin is at 0, right-handed coordinates)-->
+    
+    The BRIRs for a head facing the center of the speaker array have index_room=0.
     """
+    list_room_dim_xyz = [
+        (4.66, 5.90, 2.48),
+        (5.90, 4.66, 2.48),
+        (4.66, 5.90, 2.48),
+        (5.90, 4.66, 2.48),
+    ]
+    list_head_pos_xyz = [
+        (2.30, 3.60, 0.90),
+        (3.60, 2.36, 0.90),
+        (2.36, 2.30, 0.90),
+        (2.30, 2.30, 0.90),
+    ]
+    list_material_wall = [ # 9 = 'Fiberglass wall treatment,1 in'; 2 = 'Concrete, painted'
+        (9, 9, 9, 2),
+        (9, 2, 9, 9),
+        (9, 9, 2, 9),
+        (2, 9, 9, 9),
+    ]
     list_df_room = []
-    for index_room, head_azim in enumerate([0, 90, -180, -90]):
+    zipped = zip(list_room_dim_xyz, list_head_pos_xyz, list_material_wall)
+    for index_room, (room_dim_xyz, head_pos_xyz, material_wall) in enumerate(zipped):
         head_parameters = {
-            'head_pos_xyz': [2.3, 3.6, 0.9],
-            'head_azim': head_azim,
+            'head_pos_xyz': list(head_pos_xyz),
+            'head_azim': 0,
         }
-        material_wall = [9, 9, 9, 2] # 'Fiberglass wall treatment, 1 in' and 'Concrete, painted'
         material_floor = 13 # 'Linoleum'
         material_ceiling = 17 # 'Acoustic tiles, 0.625", 16" below ceiling'
         room_parameters = room_parameters = {
             'room_materials': list(material_wall) + [material_floor, material_ceiling],
-            'room_dim_xyz': [4.66, 5.90, 2.48],
+            'room_dim_xyz': list(room_dim_xyz),
             'is_outdoor': False,
             'material_x0': simulator.map_int_to_material[material_wall[0]],
             'material_x1': simulator.map_int_to_material[material_wall[1]],

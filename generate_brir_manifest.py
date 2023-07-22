@@ -248,6 +248,55 @@ def main(
     print(f"Wrote `df_brir` ({len(df_brir)} BRIRs):\n{fn_manifest_brir}")
 
 
+def mit_46_1004(
+        fn_manifest_room="/om2/user/msaddler/spatial_audio_pipeline/assets/brir/mit_bldg46room1004/manifest_room.pdpkl", 
+        fn_manifest_brir="/om2/user/msaddler/spatial_audio_pipeline/assets/brir/mit_bldg46room1004/manifest_brir.pdpkl",
+        list_src_dist=[1.4, 2.0]):
+    """
+    Build BRIR manifests for McDermott Lab speaker array room.
+    """
+    list_df_room = []
+    for index_room, head_azim in enumerate([0, 90, -180, -90]):
+        head_parameters = {
+            'head_pos_xyz': [2.3, 3.6, 0.9],
+            'head_azim': head_azim,
+        }
+        material_wall = [9, 9, 9, 2] # 'Fiberglass wall treatment, 1 in' and 'Concrete, painted'
+        material_floor = 13 # 'Linoleum'
+        material_ceiling = 17 # 'Acoustic tiles, 0.625", 16" below ceiling'
+        room_parameters = room_parameters = {
+            'room_materials': list(material_wall) + [material_floor, material_ceiling],
+            'room_dim_xyz': [4.66, 5.90, 2.48],
+            'is_outdoor': False,
+            'material_x0': simulator.map_int_to_material[material_wall[0]],
+            'material_x1': simulator.map_int_to_material[material_wall[1]],
+            'material_y0': simulator.map_int_to_material[material_wall[2]],
+            'material_y1': simulator.map_int_to_material[material_wall[3]],
+            'material_z0': simulator.map_int_to_material[material_floor],
+            'material_z1': simulator.map_int_to_material[material_ceiling],
+        }
+        d = {'index_room': index_room}
+        d.update(room_parameters)
+        d.update(head_parameters)
+        list_df_room.append(d)
+    df_room = pd.DataFrame(list_df_room).sort_index(axis=1)
+    df_room.to_pickle(fn_manifest_room)
+    print(f"Wrote `df_room` ({len(df_room)} rooms / head positions):\n{fn_manifest_room}")
+
+    print(f"Sampling BRIR metadata for {len(df_room)} rooms / head positions")
+    f = functools.partial(
+        get_df_brir,
+        list_src_dst=list_src_dist,
+        list_src_azim=np.arange(0, 360, 5),
+        list_src_elev=np.arange(-20, 41, 10))
+    list_dfi_room = [df_room.iloc[_] for _ in range(len(df_room))] 
+    with multiprocessing.Pool(processes=1) as p:
+        list_df_brir = p.map(f, list_dfi_room)
+    df_brir = pd.concat(list_df_brir).reset_index(drop=True).sort_index(axis=1)
+    df_brir.to_pickle(fn_manifest_brir)
+    print(f"Wrote `df_brir` ({len(df_brir)} BRIRs):\n{fn_manifest_brir}")
+
+
 if __name__ == "__main__":
     main(
         fn_manifest_room="/om2/user/msaddler/spatial_audio_pipeline/assets/brir/v00/manifest_room.pdpkl", 

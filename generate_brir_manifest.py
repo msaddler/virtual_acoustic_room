@@ -148,7 +148,8 @@ def get_df_brir(
         dfi_room,
         list_src_dst=[1.4, None],
         list_src_azim=np.arange(0, 360, 5),
-        list_src_elev=np.arange(-40, 61, 10)):
+        list_src_elev=np.arange(-40, 61, 10),
+        strict=True):
     """
     Returns dataframe describing all BRIRs for a given room and head position
     (generates all combinations of source distance, azimuth, and elevation).
@@ -179,8 +180,14 @@ def get_df_brir(
                     r * np.cos(np.deg2rad(src_elev)) * np.sin(np.deg2rad(src_azim + head_azim)) + head_pos_xyz[1],
                     r * np.sin(np.deg2rad(src_elev)) + head_pos_xyz[2],
                 ])
-                assert simulator.is_valid_position(head_pos_xyz, dfi_room.room_dim_xyz, buffer=0)
-                assert simulator.is_valid_position(src_pos_xyz, dfi_room.room_dim_xyz, buffer=0)
+                if strict:
+                    assert simulator.is_valid_position(head_pos_xyz, dfi_room.room_dim_xyz, buffer=0)
+                    assert simulator.is_valid_position(src_pos_xyz, dfi_room.room_dim_xyz, buffer=0)
+                else:
+                    if not simulator.is_valid_position(head_pos_xyz, dfi_room.room_dim_xyz, buffer=0):
+                        print(f"WARNING: invalid head_pos_xyz={head_pos_xyz} for room_dim_xyz={dfi_room.room_dim_xyz}")
+                    if not simulator.is_valid_position(src_pos_xyz, dfi_room.room_dim_xyz, buffer=0):
+                        print(f"WARNING: invalid src_pos_xyz={src_pos_xyz} for room_dim_xyz={dfi_room.room_dim_xyz}")
                 d = {
                     'index_brir': index_brir,
                     'index_room': dfi_room.index_room,
@@ -325,6 +332,112 @@ def mit_46_1004(
     list_dfi_room = [df_room.iloc[_] for _ in range(len(df_room))] 
     with multiprocessing.Pool(processes=1) as p:
         list_df_brir = p.map(f, list_dfi_room)
+    df_brir = pd.concat(list_df_brir).reset_index(drop=True).sort_index(axis=1)
+    df_brir.to_pickle(fn_manifest_brir)
+    print(f"Wrote `df_brir` ({len(df_brir)} BRIRs):\n{fn_manifest_brir}")
+
+
+def eval_rooms(
+        fn_manifest_room="/om2/user/msaddler/spatial_audio_pipeline/assets/brir/eval/manifest_room.pdpkl", 
+        fn_manifest_brir="/om2/user/msaddler/spatial_audio_pipeline/assets/brir/eval/manifest_brir.pdpkl",
+        list_src_dist=[1.4, 2.0]):
+    """
+    Build BRIR manifests for evaluation
+    """
+    list_df_room = [
+        {
+            # Anechoic, symmetric room
+            'head_azim': 0,
+            'head_pos_xyz': (2.5, 2.5, 2.0),
+            'room_dim_xyz': (5.0, 5.0, 4.0),
+            'room_materials': (26, 26, 26, 26, 26, 26),
+            'is_outdoor': False,
+        },
+        {
+            # Symmetric room with high-absorption materials
+            'head_azim': 0,
+            'head_pos_xyz': (2.5, 2.5, 2.0),
+            'room_dim_xyz': (5.0, 5.0, 4.0),
+            'room_materials': (11, 11, 11, 11, 15, 20),
+            'is_outdoor': False,
+        },
+        {
+            # Symmetric room with low-absorption materials
+            'head_azim': 0,
+            'head_pos_xyz': (2.5, 2.5, 2.0),
+            'room_dim_xyz': (5.0, 5.0, 4.0),
+            'room_materials': (1, 1, 1, 1, 12, 16),
+            'is_outdoor': False,
+        },
+        {
+            # Symmetric room with similar materials to speaker array room (all "Fiberglass wall treatment, 1 in")
+            'head_azim': 0,
+            'head_pos_xyz': (2.5, 2.5, 2.0),
+            'room_dim_xyz': (5.0, 5.0, 4.0),
+            'room_materials': (9, 9, 9, 9, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Symmetric room with similar materials to speaker array room (all "Concrete block, coarse")
+            'head_azim': 0,
+            'head_pos_xyz': (2.5, 2.5, 2.0),
+            'room_dim_xyz': (5.0, 5.0, 4.0),
+            'room_materials': (2, 2, 2, 2, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Speaker array room (no change)
+            'head_azim': 0,
+            'head_pos_xyz': (2.30, 3.60, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
+            'room_materials': (9, 9, 9, 2, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Speaker array room (person in center)
+            'head_azim': 0,
+            'head_pos_xyz': (2.33, 2.95, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
+            'room_materials': (9, 9, 9, 2, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Speaker array room (4 matching walls)
+            'head_azim': 0,
+            'head_pos_xyz': (2.30, 3.60, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
+            'room_materials': (9, 9, 9, 9, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Speaker array room (person in center + 4 matching walls)
+            'head_azim': 0,
+            'head_pos_xyz': (2.33, 2.95, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
+            'room_materials': (9, 9, 9, 9, 13, 17),
+            'is_outdoor': False,
+        },
+    ]
+    for index_room, d in enumerate(list_df_room):
+        d['index_room'] = index_room
+        d['material_x0'] = simulator.map_int_to_material[d['room_materials'][0]],
+        d['material_x1'] = simulator.map_int_to_material[d['room_materials'][1]],
+        d['material_y0'] = simulator.map_int_to_material[d['room_materials'][2]],
+        d['material_y1'] = simulator.map_int_to_material[d['room_materials'][3]],
+        d['material_z0'] = simulator.map_int_to_material[d['room_materials'][4]],
+        d['material_z1'] = simulator.map_int_to_material[d['room_materials'][5]],
+    df_room = pd.DataFrame(list_df_room).sort_index(axis=1)
+    df_room.to_pickle(fn_manifest_room)
+    print(f"Wrote `df_room` ({len(df_room)} rooms / head positions):\n{fn_manifest_room}")
+
+    print(f"Sampling BRIR metadata for {len(df_room)} rooms / head positions")
+    f = functools.partial(
+        get_df_brir,
+        list_src_dst=list_src_dist,
+        list_src_azim=np.arange(0, 360, 5),
+        list_src_elev=np.arange(-40, 61, 10),
+        strict=False)
+    list_df_brir = [f(df_room.iloc[_]) for _ in range(len(df_room))] 
     df_brir = pd.concat(list_df_brir).reset_index(drop=True).sort_index(axis=1)
     df_brir.to_pickle(fn_manifest_brir)
     print(f"Wrote `df_brir` ({len(df_brir)} BRIRs):\n{fn_manifest_brir}")

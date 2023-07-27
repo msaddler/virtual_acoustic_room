@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --time=2-00:00:00
 #SBATCH --exclude=node[017-094,097,098]
-#SBATCH --array=0-3
+#SBATCH --array=0-8
 #SBATCH --partition=normal
 
 offset=0

@@ -134,3 +134,10 @@ studwork_lightweight_walls = [
     Material("2 x 13mm plasterboard on steel frame, 50mm mineral wool in cavity, surface painted", [0.15, 0.01, 0.06, 0.04, 0.04, 0.05])
 ]
 
+glass_and_glazing = [
+    Material("4mm glass", [0.30, 0.20, 0.10, 0.07, 0.05, 0.02], "glass and glazing"),
+    Material("6mm glass", [0.10, 0.06, 0.04, 0.03, 0.02, 0.02], "glass and glazing"),
+    Material("Double glazing, 2-3mm glass, 10mm air gap", [0.15, 0.05, 0.03, 0.03, 0.02, 0.02], "glass and glazing")
+]
+
+

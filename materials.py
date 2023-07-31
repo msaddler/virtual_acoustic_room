@@ -140,4 +140,32 @@ glass_and_glazing = [
     Material("Double glazing, 2-3mm glass, 10mm air gap", [0.15, 0.05, 0.03, 0.03, 0.02, 0.02], "glass and glazing")
 ]
 
+wood_and_wood_paneling = [
+    Material("3-4mm plywood, 75mm cavity containing mineral wool", [0.50, 0.30, 0.10, 0.05, 0.05, 0.05], "wood and wood paneling"),
+    Material("5mm plywood on battens, 50mm airspace filled", [0.40, 0.35, 0.20, 0.15, 0.05, 0.05], "wood and wood paneling"),
+    Material("12mm plywood over 50mm airgap", [0.25, 0.05, 0.04, 0.03, 0.03, 0.02], "wood and wood paneling"),
+    Material("12mm plywood over 150mm airgap", [0.28, 0.08, 0.07, 0.07, 0.09, 0.09], "wood and wood paneling"),
+    Material("12mm plywood over 200mm airgap containing 50mm mineral wool", [0.14, 0.10, 0.10, 0.08, 0.10, 0.08], "wood and wood paneling"),
+    Material("Plywood mounted solidly", [0.05, None, 0.05, None, 0.05, 0.05], "wood and wood paneling"), # Will maybe leave this out since no numbers @ 250 and 1000hz
+    Material("12mm plywood in framework with 30mm airspace behind", [0.35, 0.20, 0.15, 0.10, 0.05, 0.05], "wood and wood paneling"),
+    Material("12mm plywood in framework with 30mm airspace containing glass wool", [0.40, 0.20, 0.15, 0.10, 0.10, 0.05], "wood and wood paneling"),
+    Material("Plywood, hardwood panels over 25mm airspace on solid backing", [0.30, 0.20, 0.15, 0.10, 0.10, 0.05], "wood and wood paneling"),
+    Material("Plywood, hardwood panels over 25mm airspace on solid backing with absorbent material in air space", [0.40, 0.25, 0.15, 0.10, 0.10, 0.05], "wood and wood paneling"),
+    Material("12mm wood panelling on 25mm battens", [0.31, 0.33, 0.14, 0.10, 0.10, 0.12], "wood and wood paneling"),
+    Material("Timber boards, 100mm wide, 10mm gaps, 500mm airspace with mineral wool", [0.05, 0.25, 0.60, 0.15, 0.05, 0.10], "wood and wood paneling"),
+    Material("t & g board on frame, 50mm airspace with mineral wool", [0.25, 0.15, 0.10, 0.09, 0.08, 0.07], "wood and wood paneling"),
+    Material("16-22mm t&g wood on 50mm cavity filled with mineral wool", [0.25, 0.15, 0.10, 0.09, 0.08, 0.07], "wood and wood paneling"),
+    Material("Cedar, slotted and profiled on battens mineral wool in airspace", [0.20, 0.62, 0.98, 0.62, 0.21, 0.15], "wood and wood paneling"),
+    Material("Wood boards on on joists or battens", [0.15, 0.20, 0.10, 0.10, 0.10, 0.10], "wood and wood paneling"),
+    Material("20mm dense veneered chipboard over 100mm airgap", [0.03, 0.05, 0.04, 0.03, 0.03, 0.02]. "wood and wood paneling"),
+    Material("20mm dense veneered chipboard over 200mm airgap", [0.06, 0.10, 0.08, 0.09, 0.07, 0.04], "wood and wood paneling"),
+    Material("20mm dense veneered chipboard over 250mm airgap containing 50mm mineral wool", [0.12, 0.10, 0.08, 0.07, 0.10, 0.08], "wood and wood paneling"),
+    Material("6mm wood fibre board, cavity > 100mm, empty", [0.30, 0.20, 0.20, 0.10, 0.05, 0.05], "wood and wood paneling"),
+    Material("22mm chipboard, 50mm cavity filled with mineral wool", [0.12, 0.04, 0.06, 0.05, 0.05, 0.05], "wood and wood paneling"),
+    Material("Acoustic timber wall panelling", [0.18, 0.34, 0.42, 0.59, 0.83, 0.68], "wood and wood paneling"),
+    Material("Hardwood, mahogany", [0.19, 0.23, 0.25, 0.30, 0.37, 0.42], "wood and wood paneling"),
+    Material("Chipboard on 16mm battens", [0.20, 0.25, 0.20, 0.20, 0.15, 0.20], "wood and wood paneling"),
+    Material("Chipboard on frame, 50mm airspace with mineral wool", [0.12, 0.04, 0.06, 0.05, 0.05, 0.05], "wood and wood paneling"),
+
+]
 

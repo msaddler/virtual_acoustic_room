@@ -121,3 +121,16 @@ masonry_walls = [
     Material("Plaster, lime or gypsum on solid backing", [0.03, 0.03, 0.02, 0.03, 0.04, 0.05], "masonry wall"),
 ]
 
+studwork_lightweight_walls = [
+    Material("Plasterboard on battens, 18mm airspace with glass wool", [0.30, 0.20, 0.15, 0.05, 0.05, 0.05], "studwork lightweight wall"),
+    Material("Plasterboard on frame, 100mm airspace", [0.30, 0.12, 0.08, 0.06, 0.06, 0.05], "studwork lightweight wall"),
+    Material("Plasterboard on frame, 100mm airspace with glass wool", [0.08, 0.11, 0.05, 0.03, 0.02, 0.03], "studwork lightweight wall"),
+    Material("Plasterboard on 50mm battens", [0.29, 0.10, 0.05, 0.04, 0.07, 0.09], "studwork_lightweight_wall"),
+    Material("Plasterboard on 25mm battens", [0.31, 0.33, 0.14, 0.10, 0.10, 0.12], "studwork_lightweight_wall"),
+    Material("2 x plasterboard on frame, 50mm airspace with mineral wool", [0.15, 0.10, 0.06, 0.04, 0.04, 0.05], "studwork_lightweight_wall"),
+    Material("Plasterboard on cellular core partition", [0.15, 0.00, 0.07, 0.00, 0.04, 0.05], "studwork_lightweight_wall"),
+    Material("Plasterboard on frame 100mm cavity", [0.08, 0.11, 0.05, 0.03, 0.02, 0.03], "studwork_lightweight_wall"),
+    Material("Plasterboard on frame, 100mm cavity with mineral wool", [0.30, 0.12, 0.08, 0.06, 0.06, 0.05], "studwork_lightweight_wall"),
+    Material("2 x 13mm plasterboard on steel frame, 50mm mineral wool in cavity, surface painted", [0.15, 0.01, 0.06, 0.04, 0.04, 0.05])
+]
+

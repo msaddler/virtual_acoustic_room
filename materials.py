@@ -169,3 +169,45 @@ wood_and_wood_paneling = [
 
 ]
 
+mineral_wool_and_foams = [
+    Material("Melamine based foam 25mm", [0,09 0,22 0,54 0,76 0,88 0,93], "mineral wool and foams"),
+    Material("Melamine based foam 50mm", [0,18 0,56 0,96 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 25mm 16 kg/m3", [0,12 0,28 0,55 0,71 0,74 0,83], "mineral wool and foams"),
+    Material("Glass wool 50mm, 16 kg/m3", [0,17 0,45 0,80 0,89 0,97 0,94], "mineral wool and foams"),
+    Material("Glass wool 75mm, 16 kg/m3", [0,30 0,69 0,94 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 100mm, 16 kg/m3", [0,43 0,86 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 25mm, 24 kg/m3", [0,11 0,32 0,56 0,77 0,89 0,91], "mineral wool and foams"),
+    Material("Glass wool 50mm, 24 kg/m3", [0,27 0,54 0,94 1,00 0,96 0,96], "mineral wool and foams"),
+    Material("Glass wool 75mm, 24 kg/m3", [0,28 0,79 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 100mm, 24 kg/m3", [0,46 1,00 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 50mm, 33 kg/m3", [0,20 0,55 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 75mm, 33 kg/m3", [0,37 0,85 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 100mm, 33 kg/m3", [0,53 0,92 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 50mm, 48 kg/m3", [0,30 0,80 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 75mm, 48 kg/m3", [0,43 0,97 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Glass wool 100mm, 48 kg/m3", [0,65 1,00 1,00 1,00 1,00 1,00], "mineral wool and foams"),
+    Material("Rock wool 50mm, 33 kg/m3 direct to masonry", [0,15 0,60 0,90 0,90 0,90 0,85], "mineral wool and foams"),
+    Material("Rock wool 100mm, 33 kg/m3 direct to masonry", [0,35 0,95 0,98 0,92 0,90 0,85], "mineral wool and foams"),
+    Material("Rock wool 50mm, 60 kg/m3 direct to masonry", [0,11 0,60 0,96 0,94 0,92 0,82], "mineral wool and foams"),
+    Material("Rock wool 75mm, 60 kg/m3 direct to masonry", [0,34 0,95 0,98 0,82 0,87 0,86], "mineral wool and foams"),
+    Material("Rock wool 30mm, 100 kg/m3 direct to masonry", [0,10 0,40 0,80 0,90 0,90 0,90], "mineral wool and foams"),
+    Material("Rock wool 30mm, 200 kg/m3 over 300mm air gap", [0,40 0,75 0,90 0,80 0,90 0,85], "mineral wool and foams"),
+    Material("Glass wool or mineral wool on solid backing 25mm", [0,20 0,00 0,70 0,00 0,90 0,80], "mineral wool and foams"),
+    Material("Glass wool or mineral wool on solid backing 50mm", [0,30 0,00 0,30 0,00 0,95 0,90], "mineral wool and foams"),
+    Material("Glass wool or mineral wool over air space on solid backing 25mm", [0,40 0,00 0,80 0,00 0,90 0,80], "mineral wool and foams"),
+    Material("Fibreglass super fine mat 50mm", [0,15 0,40 0,75 0,85 0,80 0,85], "mineral wool and foams"),
+    Material("Fibreglass scrim-covered sewn sheet 40mm", [0,40 0,80 0,95 0,95 0,80 0,85], "mineral wool and foams"),
+    Material("Fibreglass bitumen bonded mat 25mm", [0,10 0,35 0,50 0,55 0,70 0,70], "mineral wool and foams"),
+    Material("Fibreglass bitumen bonded mat 50mm", [0,30 0,55 0,80 0,85 0,75 0,80], "mineral wool and foams"),
+    Material("Fibreglass resin-bonded mat 25mm", [0,10 0,35 0,55 0,65 0,75 0,80], "mineral wool and foams"),
+    Material("Fibreglass resin-bonded mat 50mm", [0,20 0,50 0,70 0,80 0,75 0,80], "mineral wool and foams"),
+    Material("Fibreglass resin-bonded board 25mm", [0,10 0,25 0,55 0,70 0,80 0,85], "mineral wool and foams"),
+    Material("Flexible polyurethane foam 50mm", [0,25 0,50 0,85 0,95 0,90 0,90], "mineral wool and foams"),
+    Material("Rigid polyurethane foam 50mm", [0,20 0,40 0,65 0,55 0,70 0,70], "mineral wool and foams"),
+    Material("12mm expanded polystyrene on 45mm battens", [0,05 0,15 0,40 0,35 0,20 0,20], "mineral wool and foams"),
+    Materal("25mm expanded polystyrene on 50mm battens", [0,10 0,25 0,55 0,20 0,10 0,15], "mineral wool and foams"),
+
+]
+
+
+

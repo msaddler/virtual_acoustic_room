@@ -209,5 +209,15 @@ mineral_wool_and_foams = [
 
 ]
 
-
+wall_treatments_and_constructions = [
+    Material("Cork tiles 25mm on solid backing", [0,05 0,10 0,20 0,55 0,60 0,55], "wall treatments and constructions"),
+    Material("Cork board, 25mm on solid backing", [0,03 0,05 0,17 0,52 0,50 0,52], "wall treatments and constructions"),
+    Material("Cork board, 25mm, 2.9kg/m2, on battens", [0,15 0,40 0,65 0,35 0,35 0,30], "wall treatments and constructions"),
+    Material("Glass blocks or glazed tiles as wall finish", [0,01 0,00 0,01 0,00 0,01 0,01], "wall treatments and constructions"),
+    Material("Muslin covered cotton felt 25mm", [0,15 0,45 0,70 0,85 0,95 0,85], "wall treatments and constructions"),
+    Material("Pin up boarding- medium hardboard on solid backing", [0,05 0,00 0,10 0,00 0,10 0,10], "wall treatments and constructions"),
+    Material("Pin up boarding- softboard on solid backing", [0,05 0,00 0,10 0,00 0,10 0,10], "wall treatments and constructions"),
+    Material("Fibreboard on solid backing 12mm", [0,05 0,10 0,15 0,25 0,30 0,30], "wall treatments and constructions"),
+    Material("25mm thick hair felt, covered by scrim cloth on solid backing", [0,10 0,00 0,70 0,00 0,80 0,80], "wall treatments and constructions"),
+]
 

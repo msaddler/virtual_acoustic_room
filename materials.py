@@ -68,7 +68,6 @@ wood_and_wood_paneling = [
     Material("12mm plywood over 50mm airgap", [0.25, 0.05, 0.04, 0.03, 0.03, 0.02], "wood and wood paneling"),
     Material("12mm plywood over 150mm airgap", [0.28, 0.08, 0.07, 0.07, 0.09, 0.09], "wood and wood paneling"),
     Material("12mm plywood over 200mm airgap containing 50mm mineral wool", [0.14, 0.10, 0.10, 0.08, 0.10, 0.08], "wood and wood paneling"),
-    Material("Plywood mounted solidly", [0.05, None, 0.05, None, 0.05, 0.05], "wood and wood paneling"), # Will maybe leave this out since no numbers @ 250 and 1000hz
     Material("12mm plywood in framework with 30mm airspace behind", [0.35, 0.20, 0.15, 0.10, 0.05, 0.05], "wood and wood paneling"),
     Material("12mm plywood in framework with 30mm airspace containing glass wool", [0.40, 0.20, 0.15, 0.10, 0.10, 0.05], "wood and wood paneling"),
     Material("Plywood, hardwood panels over 25mm airspace on solid backing", [0.30, 0.20, 0.15, 0.10, 0.10, 0.05], "wood and wood paneling"),

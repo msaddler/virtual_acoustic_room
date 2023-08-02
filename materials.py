@@ -245,3 +245,32 @@ wall_treatments_and_constructions = [
     Material("Acoustic banner, 0.5 kg/m2 wool serge, 100mm from wall", [0.11, 0.40, 0.70, 0.74, 0.88, 0.89], "wall treatments and constructions"),
 ]
 
+floors = [
+    Material("Smooth marble or terrazzo slabs", [0.01, 0.01, 0.01, 0.01, 0.02, 0.02], "floors"),
+    Material("Raised computer floor, steel-faced 45mm chipboard 800mm above concrete floor, no carpet", [0.08, 0.07, 0.06, 0.07, 0.08, 0.08], "floors"),
+    Material("Raised computer floor, steel-faced 45mm chipboard 800mm above concrete floor, office-grade carpet tiles", [0.27, 0.26, 0.52, 0.43, 0.51, 0.58], "floors"),
+    Material("Wooden floor on joists", [0.15, 0.11, 0.10, 0.07, 0.06, 0.07], "floors"),
+    Material("Parquet fixed in asphalt, on concrete", [0.04, 0.04, 0.07, 0.06, 0.06, 0.07], "floors"),
+    Material("Parquet on counterfloor", [0.20, 0.15, 0.10, 0.10, 0.05, 0.10], "floors"),
+    Material("Linoleum or vinyl stuck to concrete", [0.02, 0.02, 0.03, 0.04, 0.04, 0.05], "floors"),
+    Material("Layer of rubber, cork, linoleum + underlay, or vinyl+underlay stuck to concrete", [0.02, 0.02, 0.04, 0.05, 0.05, 0.10], "floors"),
+    Material("5mm needle-felt stuck to concrete", [0.01, 0.02, 0.05, 0.15, 0.30, 0.40], "floors"),
+    Material("6mm pile carpet bonded to closed-cell foam underlay", [0.03, 0.09, 0.25, 0.31, 0.33, 0.44], "floors"),
+    Material("6mm pile carpet bonded to open-cell foam underlay", [0.03, 0.09, 0.25, 0.31, 0.33, 0.44], "floors"),
+    Material("9mm pile carpet, tufted on felt underlay", [0.08, 0.08, 0.30, 0.60, 0.75, 0.80], "floors"),
+    Material("Composition flooring", [0.05, 0.05, 0.05, 0.05, 0.05, 0.05], "floors"),
+    Material("Haircord carpet on felt underlay 6mm", [0.05, 0.05, 0.10, 0.20, 0.45, 0.65], "floors"),
+    Material("Medium pile carpet on sponge rubber underlay 10mm", [0.50, 0.10, 0.30, 0.50, 0.65, 0.70], "floors"),
+    Material("Thick pile carpet on sponge rubber underlay 15mm", [0.15, 0.25, 0.50, 0.60, 0.70, 0.70], "floors"),
+    Material("Rubber floor tiles 6mm", [0.05, 0.05, 0.10, 0.10, 0.05, 0.05], "floors"),
+    Material("Carpet, thin, over thin felt on concrete", [0.10, 0.15, 0.25, 0.30, 0.30, 0.30], "floors"),
+    Material("Carpet, thin, over thin felt on wood floor", [0.20, 0.25, 0.30, 0.30, 0.30, 0.30], "floors"),
+    Material("Carpet, needlepunch 5mm", [0.03, 0.05, 0.05, 0.25, 0.35, 0.50], "floors"),
+    Material("Stone floor, plain or tooled or granolithic finish", [0.02, 0.00, 0.02, 0.00, 0.05, 0.05], "floors"),
+    Material("Corkfloor tiles 14mm", [0.00, 0.05, 0.15, 0.25, 0.25, 0.00], "floors"),
+    Material("Sheet rubber (hard) 6mm", [0.00, 0.05, 0.05, 0.10, 0.05, 0.00], "floors"),
+    Material("Woodblock/linoleum/rubber/cork tiles (thin) on solid floor (or wall)", [0.02, 0.04, 0.05, 0.05, 0.10, 0.05], "floors"),
+    Material("Floor tiles, plastic or linoleum", [0.03, 0.00, 0.03, 0.00, 0.05, 0.05], "floors"),
+    Material("Steel decking", [0.13, 0.09, 0.08, 0.09, 0.11, 0.11], "floors"),
+
+]

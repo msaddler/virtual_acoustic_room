@@ -7,97 +7,19 @@ class Material:
     absorption_coefficients: list
     mat_type: str
 
-map_int_to_material = {
-    # WALLS
-    1: 'Brick',
-    2: 'Concrete, painted',
-    3: 'Window Glass',
-    4: 'Marble',
-    5: 'Plaster on Concrete',
-    6: 'Plywood',
-    7: 'Concrete block, coarse',
-    8: 'Heavyweight drapery',
-    9: 'Fiberglass wall treatment, 1 in',
-    10: 'Fiberglass wall treatment, 7 in',
-    11: 'Wood panelling on glass fiber blanket',
-    # FLOORS
-    12: 'Wood parquet on concrete',
-    13: 'Linoleum',
-    14: 'Carpet on concrete',
-    15: 'Carpet on foam rubber padding',
-    # CEILINGS
-    16: 'Plaster, gypsum, or lime on lath',
-    17: 'Acoustic tiles, 0.625", 16" below ceiling',
-    18: 'Acoustic tiles, 0.5", 16" below ceiling',
-    19: 'Acoustic tiles, 0.5" cemented to ceiling',
-    20: 'Highly absorptive panels, 1", 16" below ceiling',
-    # OTHERS
-    21: 'Upholstered seats',
-    22: 'Audience in upholstered seats',
-    23: 'Grass',
-    24: 'Soil',
-    25: 'Water surface',
-    26: 'Anechoic',
-    27: 'Uniform (0.6) absorbtion coefficient',
-    28: 'Uniform (0.2) absorbtion coefficient',
-    29: 'Uniform (0.8) absorbtion coefficient',
-    30: 'Uniform (0.14) absorbtion coefficient',
-    31: 'Artificial - absorbs more at high freqs',
-    32: 'Artificial with absorption higher in middle ranges',
-    33: 'Artificial - absorbs more at low freqs',
-}
-
-
 walls = [
-        [0.03, 0.03, 0.03, 0.04, 0.05, 0.07],  # 1  : Brick
-        [0.10, 0.05, 0.06, 0.07, 0.09, 0.08],  # 2  : Concrete, painted
-        [0.35, 0.25, 0.18, 0.12, 0.07, 0.04],  # 3  : Window Glass
-        [0.01, 0.01, 0.01, 0.01, 0.02, 0.02],  # 4  : Marble
-        [0.12, 0.09, 0.07, 0.05, 0.05, 0.04],  # 5  : Plaster on Concrete
-        [0.28, 0.22, 0.17, 0.09, 0.10, 0.11],  # 6  : Plywood
-        [0.36, 0.44, 0.31, 0.29, 0.39, 0.25],  # 7  : Concrete block, coarse
-        [0.14, 0.35, 0.55, 0.72, 0.70, 0.65],  # 8  : Heavyweight drapery
-        [0.08, 0.32, 0.99, 0.76, 0.34, 0.12],  # 9  : Fiberglass wall treatment, 1 in
-        [0.86, 0.99, 0.99, 0.99, 0.99, 0.99],  # 10 : Fiberglass wall treatment, 7 in
-        [0.40, 0.90, 0.80, 0.50, 0.40, 0.30],  # 11 : Wood panelling on glass fiber blanket
+    Material("Brick", [0.03, 0.03, 0.03, 0.04, 0.05, 0.07], "wall"),
+    Material("Concrete, painted", [0.10, 0.05, 0.06, 0.07, 0.09, 0.08], "wall"),
+    Material("Window Glass", [0.35, 0.25, 0.18, 0.12, 0.07, 0.04], "wall"),
+    Material("Marble", [0.01, 0.01, 0.01, 0.01, 0.02, 0.02], "wall"),
+    Material("Plaster on Concrete", [0.12, 0.09, 0.07, 0.05, 0.05, 0.04], "wall"),
+    Material("Plywood", [0.28, 0.22, 0.17, 0.09, 0.10, 0.11], "wall"),
+    Material("Concrete block, coarse", [0.36, 0.44, 0.31, 0.29, 0.39, 0.25], "wall"),
+    Material("Heavyweight drapery", [0.14, 0.35, 0.55, 0.72, 0.70, 0.65], "wall"),
+    Material("Fiberglass wall treatment, 1 in", [0.08, 0.32, 0.99, 0.76, 0.34, 0.12], "wall"),
+    Material("Fiberglass wall treatment, 7 in", [0.86, 0.99, 0.99, 0.99, 0.99, 0.99], "wall"),
+    Material("Wood panelling on glass fiber blanket", [0.40, 0.90, 0.80, 0.50, 0.40, 0.30], "wall"),
 ]
-floors = [
-        [0.04, 0.04, 0.07, 0.06, 0.06, 0.07],  # 12 : Wood parquet on concrete
-        [0.02, 0.03, 0.03, 0.03, 0.03, 0.02],  # 13 : Linoleum
-        [0.02, 0.06, 0.14, 0.37, 0.60, 0.65],  # 14 : Carpet on concrete
-        [0.08, 0.24, 0.57, 0.69, 0.71, 0.73],  # 15 : Carpet on foam rubber padding
-]
-ceilings = [
-        [0.14, 0.10, 0.06, 0.05, 0.04, 0.03],  # 16 : Plaster, gypsum, or lime on lath
-        [0.25, 0.28, 0.46, 0.71, 0.86, 0.93],  # 17 : Acoustic tiles, 0.625", 16" below ceiling
-        [0.52, 0.37, 0.50, 0.69, 0.79, 0.78],  # 18 : Acoustic tiles, 0.5", 16" below ceiling
-        [0.10, 0.22, 0.61, 0.66, 0.74, 0.72],  # 19 : Acoustic tiles, 0.5" cemented to ceiling
-        [0.58, 0.88, 0.75, 0.99, 1.00, 0.96],  # 20 : Highly absorptive panels, 1", 16" below ceiling
-]
-others = [
-        [0.19, 0.37, 0.56, 0.67, 0.61, 0.59],  # 21 : Upholstered seats
-        [0.39, 0.57, 0.80, 0.94, 0.92, 0.87],  # 22 : Audience in upholstered seats
-        [0.11, 0.26, 0.60, 0.69, 0.92, 0.99],  # 23 : Grass
-        [0.15, 0.25, 0.40, 0.55, 0.60, 0.60],  # 24 : Soil
-        [0.01, 0.01, 0.01, 0.02, 0.02, 0.03],  # 25 : Water surface
-        [1.00, 1.00, 1.00, 1.00, 1.00, 1.00],  # 26 : Anechoic
-        # 27 : Uniform (0.6) absorbtion coefficient
-        [0.60, 0.60, 0.60, 0.60, 0.60, 0.60],
-        # 28 : Uniform (0.2) absorbtion coefficient
-        [0.20, 0.20, 0.20, 0.20, 0.20, 0.20],
-        # 29 : Uniform (0.8) absorbtion coefficient
-        [0.80, 0.80, 0.80, 0.80, 0.80, 0.80],
-        # 30 : Uniform (0.14) absorbtion coefficient
-        [0.14, 0.14, 0.14, 0.14, 0.14, 0.14],
-        # 31 : Artificial - absorbs more at high freqs
-        [0.08, 0.08, 0.10, 0.10, 0.12, 0.12],
-        # 32 : Artificial with absorption higher in middle ranges
-        [0.05, 0.05, 0.20, 0.20, 0.10, 0.10],
-        # 33 : Artificial  - absorbs more at low freqs
-        [0.12, 0.12, 0.10, 0.10, 0.08, 0.08],
-]
-
-
 
 # from https://www.acoustic.ua/st/web_absorption_data_eng.pdf
 
@@ -166,7 +88,6 @@ wood_and_wood_paneling = [
     Material("Hardwood, mahogany", [0.19, 0.23, 0.25, 0.30, 0.37, 0.42], "wood and wood paneling"),
     Material("Chipboard on 16mm battens", [0.20, 0.25, 0.20, 0.20, 0.15, 0.20], "wood and wood paneling"),
     Material("Chipboard on frame, 50mm airspace with mineral wool", [0.12, 0.04, 0.06, 0.05, 0.05, 0.05], "wood and wood paneling"),
-
 ]
 
 mineral_wool_and_foams = [
@@ -272,6 +193,9 @@ floors = [
     Material("Woodblock/linoleum/rubber/cork tiles (thin) on solid floor (or wall)", [0.02, 0.04, 0.05, 0.05, 0.10, 0.05], "floors"),
     Material("Floor tiles, plastic or linoleum", [0.03, 0.00, 0.03, 0.00, 0.05, 0.05], "floors"),
     Material("Steel decking", [0.13, 0.09, 0.08, 0.09, 0.11, 0.11], "floors"),
+    Material("Linoleum", [0.02, 0.03, 0.03, 0.03, 0.03, 0.02], "floors"),
+    Material("Carpet on concrete", [0.02, 0.06, 0.14, 0.37, 0.60, 0.65], "floors"),
+    Material("Carpet on foam rubber padding", [0.08, 0.24, 0.57, 0.69, 0.71, 0.73], "floors"),
 
 ]
 
@@ -304,7 +228,73 @@ ceilings = [
     Material("50mm mineral wool ( 96 kg/m3 ) behind 25% open area perforated steel", [0.20, 0.35, 0.65, 0.85, 0.90, 0.80], "ceilings"),
     Material("Wood panels, 18mm alternate 15mm slot & 35mm wooden slat", [0.10, 0.36, 0.74, 0.91, 0.61, 0.50], "ceilings"),
     Material("Plaster decorative panels, ceilings", [0.20, 0.22, 0.18, 0.15, 0.15, 0.16], "ceilings"),
-
-
-
+    Material("Plaster, gypsum, or lime on lath", [0.14, 0.10, 0.06, 0.05, 0.04, 0.03], "ceilings"),
+    Material("Acoustic tiles, 0.625\", 16\" below ceiling", [0.25, 0.28, 0.46, 0.71, 0.86, 0.93], "ceilings"),
+    Material("Acoustic tiles, 0.5\", 16\" below ceiling", [0.52, 0.37, 0.50, 0.69, 0.79, 0.78], "ceilings"),
+    Material("Acoustic tiles, 0.5\" cemented to ceiling", [0.10, 0.22, 0.61, 0.66, 0.74, 0.72], "ceilings"),
+    Material("Highly absorptive panels, 1\", 16\" below ceiling", [0.58, 0.88, 0.75, 0.99, 1.00, 0.96], "ceilings"),
 ]
+
+
+audience_and_seating = [
+    Material("Children, standing", [0.12, 0.22, 0.37, 0.40, 0.42, 0.37], "audience and seating"),
+    Material("Children, seated in plastic or metal chairs", [0.28, 0.00, 0.33, 0.00, 0.37, 0.37], "audience and seating"),
+    Material("Students seated in tablet arm chairs", [0.30, 0.41, 0.49, 0.84, 0.87, 0.84], "audience and seating"),
+    Material("Adults per person seated", [0.33, 0.40, 0.44, 0.45, 0.45, 0.45], "audience and seating"),
+    Material("Adults per person standing", [0.15, 0.38, 0.42, 0.43, 0.45, 0.45], "audience and seating"),
+    Material("Empty plastic or metal chairs", [0.07, 0.00, 0.14, 0.00, 0.14, 0.14], "audience and seating"),
+    Material("Seats, leather covers", [0.40, 0.50, 0.58, 0.61, 0.58, 0.50], "audience and seating"),
+    Material("Cloth-upholstered seats", [0.44, 0.60, 0.77, 0.89, 0.82, 0.70], "audience and seating"),
+    Material("Floor and cloth-upholstered seats", [0.49, 0.66, 0.80, 0.88, 0.82, 0.70], "audience and seating"),
+    Material("Adults in plastic and metal chairs", [0.30, 0.00, 0.40, 0.00, 0.43, 0.40], "audience and seating"),
+    Material("Adults in wooden or padded chairs or seats", [0.16, 0.00, 0.40, 0.00, 0.44, 0.40], "audience and seating"),
+    Material("Adults on timber seats, 1 per m2", [0.16, 0.24, 0.56, 0.69, 0.81, 0.78], "audience and seating"),
+    Material("Adults on timber seats, 2 per m2", [0.24, 0.40, 0.78, 0.98, 0.96, 0.87], "audience and seating"),
+    Material("Wooden or padded chairs or seats", [0.08, 0.00, 0.15, 0.00, 0.18, 0.20], "audience and seating"),
+    Material("Seating, slighty upholstered, unoccupied", [0.07, 0.12, 0.26, 0.42, 0.50, 0.55], "audience and seating"),
+    Material("Seating, slighty upholstered, occupied", [0.32, 0.62, 0.74, 0.76, 0.81, 0.90], "audience and seating"),
+    Material("Fully upholstered seats", [0.12, 0.00, 0.28, 0.00, 0.32, 0.37], "audience and seating"),
+    Material("Upholstered tip-up theatre seats, empty", [0.33, 0.51, 0.64, 0.71, 0.77, 0.81], "audience and seating"),
+    Material("Areas with audience, orchestra, or seats, including narrow aisles", [0.60, 0.74, 0.88, 0.96, 0.93, 0.85], "audience and seating"),
+    Material("Auditorium seat, unoccupied", [0.13, 0.33, 0.59, 0.58, 0.61, 0.62], "audience and seating"),
+    Material("Auditorium seat, occupied", [0.37, 0.48, 0.68, 0.73, 0.77, 0.74], "audience and seating"),
+    Material("Orchestra with instruments on podium", [0.27, 0.53, 0.67, 0.93, 0.87, 0.80], "audience and seating"),
+    Material("Orchestral player with instrument", [0.37, 0.80, 1.00, 1.00, 1.00, 1.00], "audience and seating"),
+    Material("Prosenium opening with average stage set per m2 of opening", [0.20, 0.00, 0.30, 0.00, 0.40, 0.50], "audience and seating"),
+    Material("Wood platform with large space beneath", [0.40, 0.30, 0.20, 0.17, 0.15, 0.10], "audience and seating"),
+    Material("Adult office furniture per desk", [0.50, 0.40, 0.45, 0.45, 0.60, 0.70], "audience and seating"),
+]
+
+others = [
+    Material("Ventilation grill per m2", [0.60, 0.60, 0.60, 0.60, 0.60, 0.60], "other"),
+    Material("Grass", [0.11, 0.26, 0.60, 0.69, 0.92, 0.99], "other"),
+    Material("Soil", [0.15, 0.25, 0.40, 0.55, 0.60, 0.60], "other"),
+    Material("Water surface", [0.01, 0.01, 0.01, 0.02, 0.02, 0.03], "other"),
+    Material("Anechoic", [1.00, 1.00, 1.00, 1.00, 1.00, 1.00], "other"),
+    Material("Uniform (0.6) absorbtion coefficient", [0.60, 0.60, 0.60, 0.60, 0.60, 0.60], "other"),
+    Material("Uniform (0.2) absorbtion coefficient", [0.20, 0.20, 0.20, 0.20, 0.20, 0.20], "other"),
+    Material("Uniform (0.8) absorbtion coefficient", [0.80, 0.80, 0.80, 0.80, 0.80, 0.80], "other"),
+    Material("Uniform (0.14) absorbtion coefficient", [0.14, 0.14, 0.14, 0.14, 0.14, 0.14], "other"),
+    Material("Artificial - absorbs more at high freqs", [0.08, 0.08, 0.10, 0.10, 0.12, 0.12], "other"),
+    Material("Artificial with absorption higher in middle ranges", [0.05, 0.05, 0.20, 0.20, 0.10, 0.10], "other"),
+    Material("Artificial  - absorbs more at low freqs", [0.12, 0.12, 0.10, 0.10, 0.08, 0.08], "other"),
+]
+
+
+all_materials = [
+    *walls,
+    *masonry_walls,
+    *studwork_lightweight_walls,
+    *glass_and_glazing,
+    *wood_and_wood_paneling,
+    *mineral_wool_and_foams,
+    *wall_treatments_and_constructions,
+    *floors,
+    *panels_and_doors,
+    *ceilings,
+    *audience_and_seating,
+    *others,
+]
+
+map_int_to_material = {i: m for i, m in enumerate(all_materials, start=1)}
+

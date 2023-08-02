@@ -281,7 +281,7 @@ others = [
 ]
 
 
-all_materials = [
+ALL_MATERIALS = [
     *walls,
     *masonry_walls,
     *studwork_lightweight_walls,
@@ -296,5 +296,5 @@ all_materials = [
     *others,
 ]
 
-map_int_to_material = {i: m for i, m in enumerate(all_materials, start=1)}
+map_int_to_material = {i: m for i, m in enumerate(ALL_MATERIALS, start=1)}
 

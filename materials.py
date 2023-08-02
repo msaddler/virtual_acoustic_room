@@ -274,3 +274,37 @@ floors = [
     Material("Steel decking", [0.13, 0.09, 0.08, 0.09, 0.11, 0.11], "floors"),
 
 ]
+
+panels_and_doors = [
+    Material("Wood hollowcore door", [0.30, 0.25, 0.15, 0.10, 0.10, 0.07], "panels and doors"),
+    Material("Solid timber door", [0.14, 0.10, 0.06, 0.08, 0.10, 0.10], "panels and doors"),
+    Material("Acoustic door, steel frame, double seals, absorbant in airspace", [0.35, 0.39, 0.44, 0.49, 0.54, 0.57], "panels and doors"),
+]
+
+ceilings = [
+    Material("Mineral wool tiles, 180mm airspace", [0.42, 0.72, 0.83, 0.88, 0.89, 0.80], "ceilings"),
+    Material("Mineral wool tiles, glued/screwed to soffit", [0.06, 0.40, 0.75, 0.95, 0.96, 0.83], "ceilings"),
+    Material("Gypsum plaster tiles, 17% perforated, 22mm", [0.45, 0.70, 0.80, 0.80, 0.65, 0.45], "ceilings"),
+    Material("Metal ceiling, 32.5% perforated, backed by 30mm rockwool", [0.12, 0.45, 0.87, 0.98, 1.00, 1.00], "ceilings"),
+    Material("Perforated underside of structural steel decking", [0.30, 0.70, 0.85, 0.90, 0.70, 0.65], "ceilings"),
+    Material("12% perforated plaster tiles, absorbent felt glued to back, 200mm ceiling void", [0.45, 0.70, 0.88, 0.52, 0.42, 0.35], "ceilings"),
+    Material("100mm woodwool slabs on 25mm cavity, pre-screeded surface facing cavity", [0.50, 0.75, 0.85, 0.65, 0.70, 0.70], "ceilings"),
+    Material("50mm woodwool slabs on 25mm cavity, pre-screeded surface facing cavity", [0.30, 0.40, 0.50, 0.85, 0.50, 0.65], "ceilings"),
+    Material("100mm woodwool fixed directly to concrete, pre-screeded surface facing backing", [0.25, 0.80, 0.85, 0.65, 0.70, 0.75], "ceilings"),
+    Material("75mm woodwool fixed directly to concrete, pre-screeded surface facing backing", [0.15, 0.40, 0.95, 0.60, 0.70, 0.60], "ceilings"),
+    Material("Plasterboard 10mm thick backed with 25mm thick bitumen", [0.30, 0.20, 0.15, 0.05, 0.05, 0.05], "ceilings"),
+    Material("Plasterboard 10mm thick, perforated 8mm diameter holes 2755m2 14% open area backed with 25mm thick bitumen- bonded fibreglass on 90mm battens", [0.25, 0.70, 0.85, 0.55, 0.40, 0.30], "ceilings"),
+    Material("Plywood, 5mm, on battens 50mm airspace filled with glass wool", [0.40, 0.35, 0.20, 0.15, 0.05, 0.05], "ceilings"),
+    Material("Plywood, 12mm, with 30mm thick fibreglass backing between 30mm battens", [0.40, 0.20, 0.15, 0.10, 0.10, 0.05], "ceilings"),
+    Material("Plywood 12mm thick perforated 5mm diameter holes 6200 m2 11% open area with 60mm deep air space behind", [0.20, 0.35, 0.55, 0.30, 0.25, 0.30], "ceilings"),
+    Material("Plywood 12mm thick perforated 5mm diameter holes 6200 m2 11% open area with thick fibreglass between mounting battens", [0.40, 0.90, 0.80, 0.50, 0.40, 0.30], "ceilings"),
+    Material("Hardboard, 25% perforated over 50mm mineral wool", [0.27, 0.87, 1.00, 1.00, 0.98, 0.96], "ceilings"),
+    Material("0.8mm unperforated metal panels backed with 25mm thick resin bonded fibreglass, mounted on 22mm diameter pipes 135mm from wall", [0.50, 0.35, 0.15, 0.05, 0.05, 0.00], "ceilings"),
+    Material("0.8mm perforated metal tiles 2mm diameter holes 29440/m2. 13% open area backed with 25mm thick resin-bonded fibreglass slab. No airspace.", [0.10, 0.30, 0.60, 0.75, 0.80, 0.80], "ceilings"),
+    Material("50mm mineral wool ( 96 kg/m3 ) behind 25% open area perforated steel", [0.20, 0.35, 0.65, 0.85, 0.90, 0.80], "ceilings"),
+    Material("Wood panels, 18mm alternate 15mm slot & 35mm wooden slat", [0.10, 0.36, 0.74, 0.91, 0.61, 0.50], "ceilings"),
+    Material("Plaster decorative panels, ceilings", [0.20, 0.22, 0.18, 0.15, 0.15, 0.16], "ceilings"),
+
+
+
+]

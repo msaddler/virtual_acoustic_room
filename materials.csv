@@ -34,7 +34,7 @@ material_int,material_type,material_name,thickness,absorption_coefficients,absor
 -1,wood and wood panelling,12mm plywood over 50mm airgap,1,"[0.25, 0.05, 0.04, 0.03, 0.03, 0.02]","[125, 250, 500, 1000, 2000, 4000]"
 -1,wood and wood panelling,12mm plywood over 150mm airgap,1,"[0.28, 0.08, 0.07, 0.07, 0.09, 0.09]","[125, 250, 500, 1000, 2000, 4000]"
 -1,wood and wood panelling,12mm plywood over 200mm airgap containing 50mm mineral wool,1,"[0.14, 0.1, 0.1, 0.08, 0.1, 0.08]","[125, 250, 500, 1000, 2000, 4000]"
--1,wood and wood panelling,plywood mounted solidly,,"[0.05, nan, 0.05, nan, 0.05, 0.05]","[125, 250, 500, 1000, 2000, 4000]"
+-1,wood and wood panelling,plywood mounted solidly,,"[0.05, 0.05, 0.05, 0.05, 0.05, 0.05]","[125, 250, 500, 1000, 2000, 4000]"
 -1,wood and wood panelling,12mm plywood in framework with 30mm airspace behind,12mm,"[0.35, 0.2, 0.15, 0.1, 0.05, 0.05]","[125, 250, 500, 1000, 2000, 4000]"
 -1,wood and wood panelling,12mm plywood in framework with 30mm airspace containing glass wool,12mm,"[0.4, 0.2, 0.15, 0.1, 0.1, 0.05]","[125, 250, 500, 1000, 2000, 4000]"
 -1,wood and wood panelling,"plywood, hardwood panels over 25mm airspace on solid backing",,"[0.3, 0.2, 0.15, 0.1, 0.1, 0.05]","[125, 250, 500, 1000, 2000, 4000]"

@@ -54,11 +54,11 @@ def load_kemar_hrtfs(npz_filename='kemar_hrtfs/hrtfs.npz'):
     return hrtf_locs, hrtf_firs, hrtf_sr
 
 
-def get_absorption_coefficients_from_int(material_int):
+def get_material_from_material_int(material_int):
     """
-    The MATLAB function `acoeff_hrtf.m` maps materials to acoustic absorption coefficients.
-    This function maps integer codes to (absorption_freq, absorption_coef) tuples for the
-    materials that were originally included in the MATLAB implementation.
+    The MATLAB function `acoeff_hrtf.m` maps integer codes to materials with different
+    acoustic absorption coefficients. This function maps the same integer codes to
+    dict-like objects corresponding to materials included in the MATLAB implementation.
     """
     df = pd.read_csv('materials_original.csv')
     df.absorption_coefficients = df.absorption_coefficients.map(lambda _: np.array(eval(_), dtype=float))
@@ -77,7 +77,7 @@ def acoeff_hrtf(material, freq=[125, 250, 500, 1000, 2000, 4000], verbose=False)
     freq = np.array(freq, dtype=float)
     if isinstance(material, (np.integer, int)):
         # If material is an integer, convert to dict via mapping from original MATLAB implementation
-        material = get_absorption_coefficients_from_int(material)
+        material = get_material_from_material_int(material)
     if 'absorption_coefficients' in dict(material):
         # Otherwise, material must be dict-like with `absorption_frequencies` and `absorption_coefficients`
         absorption_frequencies = dict(material)['absorption_frequencies']

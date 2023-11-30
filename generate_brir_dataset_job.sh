@@ -2,7 +2,7 @@
 #
 #SBATCH --job-name=generate_brir
 #SBATCH --out="slurm-%A_%a.out"
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=32
 #SBATCH --mem=4000
 #SBATCH --nodes=1
 #SBATCH --time=2-00:00:00

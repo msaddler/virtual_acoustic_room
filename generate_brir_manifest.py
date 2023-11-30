@@ -449,7 +449,7 @@ def speech_in_noise_in_reverb_rooms(
         dir_manifest="/om2/user/msaddler/spatial_audio_pipeline/assets/brir",
         fn_manifest_room="speech_in_noise_in_reverb/manifest_room.pdpkl", 
         fn_manifest_brir="speech_in_noise_in_reverb/manifest_brir.pdpkl",
-        list_src_dist=[2.5]):
+        list_src_dist=[2.0]):
     """
     Build BRIR manifests for speech in noise in reverb experiments.
     """
@@ -457,42 +457,42 @@ def speech_in_noise_in_reverb_rooms(
     fn_manifest_brir = os.path.join(dir_manifest, fn_manifest_brir)
     list_df_room = [
         {
-            # Anechoic
+            # Speaker array room (no change)
             'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'head_pos_xyz': (2.30, 3.60, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
+            'room_materials': (9, 9, 9, 2, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Speaker array room (anechoic)
+            'head_azim': 0,
+            'head_pos_xyz': (2.30, 3.60, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
             'room_materials': (26, 26, 26, 26, 26, 26),
             'is_outdoor': False,
         },
         {
-            # Wood panelling on glass fiber blanket
+            # Speaker array room (low reverb: Wood panelling on glass fiber blanket)
             'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'head_pos_xyz': (2.30, 3.60, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
             'room_materials': (11, 11, 11, 11, 13, 17),
             'is_outdoor': False,
         },
         {
-            # Concrete block, coarse
+            # Speaker array room (medium reverb: Fiberglass wall treatment, 1 in)
             'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
-            'room_materials': (7, 7, 7, 7, 13, 17),
-            'is_outdoor': False,
-        },
-        {
-            # Fiberglass wall treatment, 1 in
-            'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'head_pos_xyz': (2.30, 3.60, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
             'room_materials': (9, 9, 9, 9, 13, 17),
             'is_outdoor': False,
         },
         {
-            # Plaster on concrete
+            # Speaker array room (high reverb: Plaster on concrete)
             'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'head_pos_xyz': (2.30, 3.60, 0.90),
+            'room_dim_xyz': (4.66, 5.90, 2.48),
             'room_materials': (5, 5, 5, 5, 13, 17),
             'is_outdoor': False,
         },

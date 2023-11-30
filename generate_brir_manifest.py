@@ -149,6 +149,7 @@ def get_df_brir(
         list_src_dst=[1.4, None],
         list_src_azim=np.arange(0, 360, 5),
         list_src_elev=np.arange(-40, 61, 10),
+        dict_update={},
         strict=True):
     """
     Returns dataframe describing all BRIRs for a given room and head position
@@ -208,6 +209,7 @@ def get_df_brir(
                     'use_highpass': True,
                     'incorporate_lead_zeros': True,
                 }
+                d.update(dict_update)
                 list_d.append(d)
                 index_brir = index_brir + 1
     df_brir = pd.DataFrame(list_d)
@@ -442,6 +444,69 @@ def eval_rooms(
     df_brir.to_pickle(fn_manifest_brir)
     print(f"Wrote `df_brir` ({len(df_brir)} BRIRs):\n{fn_manifest_brir}")
 
+
+def ruggles_shinncunningham_2011_rooms(
+        dir_manifest="/om2/user/msaddler/spatial_audio_pipeline/assets/brir",
+        fn_manifest_room="ruggles_shinncunningham_2011/manifest_room.pdpkl", 
+        fn_manifest_brir="ruggles_shinncunningham_2011/manifest_brir.pdpkl",
+        list_src_dist=[2.5]):
+    """
+    Build BRIR manifests for Ruggles & Shinn-Cunningham (2011, JARO) experiments.
+    """
+    fn_manifest_room = os.path.join(dir_manifest, fn_manifest_room)
+    fn_manifest_brir = os.path.join(dir_manifest, fn_manifest_brir)
+    list_df_room = [
+        {
+            # Anechoic (T60 = 0s)
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': [{
+                'absorption_frequencies': [125, 250, 500, 1000, 2000, 4000],
+                'absorption_coefficients': [1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
+            }] * 6,
+            'is_outdoor': False,
+        },
+        {
+            # Intermediate reverberation (T60 = 0.4s)
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': [{
+                'absorption_frequencies': [125, 250, 500, 1000, 2000, 4000],
+                'absorption_coefficients': [0.14, 0.10, 0.06, 0.05, 0.09, 0.03],
+            }] * 6,
+            'is_outdoor': False,
+        },
+        {
+            # High reverberation (T60 = 3.0s)
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': [{
+                'absorption_frequencies': [125, 250, 500, 1000, 2000, 4000],
+                'absorption_coefficients': [0.10, 0.05, 0.06, 0.07, 0.09, 0.08],
+            }] * 6,
+            'is_outdoor': False,
+        },
+    ]
+    for index_room, d in enumerate(list_df_room):
+        d['index_room'] = index_room
+    df_room = pd.DataFrame(list_df_room).sort_index(axis=1)
+    df_room.to_pickle(fn_manifest_room)
+    print(f"Wrote `df_room` ({len(df_room)} rooms / head positions):\n{fn_manifest_room}")
+
+    print(f"Sampling BRIR metadata for {len(df_room)} rooms / head positions")
+    f = functools.partial(
+        get_df_brir,
+        list_src_dst=list_src_dist,
+        list_src_azim=np.arange(0, 360, 5),
+        list_src_elev=[0],
+        strict=False)
+    list_df_brir = [f(df_room.iloc[_]) for _ in range(len(df_room))] 
+    df_brir = pd.concat(list_df_brir).reset_index(drop=True).sort_index(axis=1)
+    df_brir.to_pickle(fn_manifest_brir)
+    print(f"Wrote `df_brir` ({len(df_brir)} BRIRs):\n{fn_manifest_brir}")
 
 if __name__ == "__main__":
     main(

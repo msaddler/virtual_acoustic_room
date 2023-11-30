@@ -445,13 +445,13 @@ def eval_rooms(
     print(f"Wrote `df_brir` ({len(df_brir)} BRIRs):\n{fn_manifest_brir}")
 
 
-def ruggles_shinncunningham_2011_rooms(
+def speech_in_noise_in_reverb_rooms(
         dir_manifest="/om2/user/msaddler/spatial_audio_pipeline/assets/brir",
-        fn_manifest_room="ruggles_shinncunningham_2011/manifest_room.pdpkl", 
-        fn_manifest_brir="ruggles_shinncunningham_2011/manifest_brir.pdpkl",
+        fn_manifest_room="speech_in_noise_in_reverb/manifest_room.pdpkl", 
+        fn_manifest_brir="speech_in_noise_in_reverb/manifest_brir.pdpkl",
         list_src_dist=[2.5]):
     """
-    Build BRIR manifests for Ruggles & Shinn-Cunningham (2011, JARO) experiments.
+    Build BRIR manifests for speech in noise in reverb experiments.
     """
     fn_manifest_room = os.path.join(dir_manifest, fn_manifest_room)
     fn_manifest_brir = os.path.join(dir_manifest, fn_manifest_brir)
@@ -465,27 +465,11 @@ def ruggles_shinncunningham_2011_rooms(
             'is_outdoor': False,
         },
         {
-            # Low reverb (Wood panelling on glass fiber blanket + carpet)
-            'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
-            'room_materials': (11, 11, 11, 11, 15, 20),
-            'is_outdoor': False,
-        },
-        {
             # Wood panelling on glass fiber blanket
             'head_azim': 0,
             'head_pos_xyz': (3.5, 2.5, 1.8),
             'room_dim_xyz': (7.0, 5.0, 3.0),
             'room_materials': (11, 11, 11, 11, 13, 17),
-            'is_outdoor': False,
-        },
-        {
-            # Fiberglass wall treatment, 1 in
-            'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
-            'room_materials': (9, 9, 9, 9, 13, 17),
             'is_outdoor': False,
         },
         {
@@ -497,19 +481,19 @@ def ruggles_shinncunningham_2011_rooms(
             'is_outdoor': False,
         },
         {
+            # Fiberglass wall treatment, 1 in
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': (9, 9, 9, 9, 13, 17),
+            'is_outdoor': False,
+        },
+        {
             # Plaster on concrete
             'head_azim': 0,
             'head_pos_xyz': (3.5, 2.5, 1.8),
             'room_dim_xyz': (7.0, 5.0, 3.0),
             'room_materials': (5, 5, 5, 5, 13, 17),
-            'is_outdoor': False,
-        },
-        {
-            # Window glass
-            'head_azim': 0,
-            'head_pos_xyz': (3.5, 2.5, 1.8),
-            'room_dim_xyz': (7.0, 5.0, 3.0),
-            'room_materials': (3, 3, 3, 3, 13, 17),
             'is_outdoor': False,
         },
     ]

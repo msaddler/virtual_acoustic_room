@@ -457,36 +457,59 @@ def ruggles_shinncunningham_2011_rooms(
     fn_manifest_brir = os.path.join(dir_manifest, fn_manifest_brir)
     list_df_room = [
         {
-            # Anechoic (T60 = 0s)
+            # Anechoic
             'head_azim': 0,
             'head_pos_xyz': (3.5, 2.5, 1.8),
             'room_dim_xyz': (7.0, 5.0, 3.0),
-            'room_materials': [{
-                'absorption_frequencies': [125, 250, 500, 1000, 2000, 4000],
-                'absorption_coefficients': [1.00, 1.00, 1.00, 1.00, 1.00, 1.00],
-            }] * 6,
+            'room_materials': (26, 26, 26, 26, 26, 26),
             'is_outdoor': False,
         },
         {
-            # Intermediate reverberation (T60 = 0.4s)
+            # Low reverb (Wood panelling on glass fiber blanket + carpet)
             'head_azim': 0,
             'head_pos_xyz': (3.5, 2.5, 1.8),
             'room_dim_xyz': (7.0, 5.0, 3.0),
-            'room_materials': [{
-                'absorption_frequencies': [125, 250, 500, 1000, 2000, 4000],
-                'absorption_coefficients': [0.14, 0.10, 0.06, 0.05, 0.09, 0.03],
-            }] * 6,
+            'room_materials': (11, 11, 11, 11, 15, 20),
             'is_outdoor': False,
         },
         {
-            # High reverberation (T60 = 3.0s)
+            # Wood panelling on glass fiber blanket
             'head_azim': 0,
             'head_pos_xyz': (3.5, 2.5, 1.8),
             'room_dim_xyz': (7.0, 5.0, 3.0),
-            'room_materials': [{
-                'absorption_frequencies': [125, 250, 500, 1000, 2000, 4000],
-                'absorption_coefficients': [0.10, 0.05, 0.06, 0.07, 0.09, 0.08],
-            }] * 6,
+            'room_materials': (11, 11, 11, 11, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Fiberglass wall treatment, 1 in
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': (9, 9, 9, 9, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Concrete block, coarse
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': (7, 7, 7, 7, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Plaster on concrete
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': (5, 5, 5, 5, 13, 17),
+            'is_outdoor': False,
+        },
+        {
+            # Window glass
+            'head_azim': 0,
+            'head_pos_xyz': (3.5, 2.5, 1.8),
+            'room_dim_xyz': (7.0, 5.0, 3.0),
+            'room_materials': (3, 3, 3, 3, 13, 17),
             'is_outdoor': False,
         },
     ]

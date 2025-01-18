@@ -80,10 +80,11 @@ def main(df, fn, processes=8):
 
 if __name__ == "__main__":
     index_room = int(sys.argv[1])
+    fn_manifest_brir = "/om2/scratch/Mon/msaddler/brir/v00/manifest_brir.pdpkl"
 #     fn_manifest_brir = "/om2/user/msaddler/spatial_audio_pipeline/assets/brir/v00/manifest_brir.pdpkl"
 #     fn_manifest_brir = "/om2/user/msaddler/spatial_audio_pipeline/assets/brir/mit_bldg46room1004/manifest_brir.pdpkl"
 #     fn_manifest_brir = "/om2/user/msaddler/spatial_audio_pipeline/assets/brir/eval/manifest_brir.pdpkl"
-    fn_manifest_brir = "/om2/user/msaddler/spatial_audio_pipeline/assets/brir/speech_in_noise_in_reverb/manifest_brir.pdpkl"
+    # fn_manifest_brir = "/om2/user/msaddler/spatial_audio_pipeline/assets/brir/speech_in_noise_in_reverb/manifest_brir.pdpkl"
     df_manifest_brir = pd.read_pickle(fn_manifest_brir)
     df = df_manifest_brir[df_manifest_brir.index_room == index_room]
     assert len(df) > 0, f"Found no matching BRIRs for index_room={index_room}"

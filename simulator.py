@@ -13,6 +13,26 @@ import scipy.io
 import scipy.signal
 
 
+def normalize_angle(angle, lower=-180, upper=180):
+    """
+    Based on `normalize` function from:
+    https://gist.github.com/phn/1111712/35e8883de01916f64f7f97da9434622000ac0390
+    """
+    assert lower < upper, f"Invalid lower and upper limits: [{lower}, {upper}]"
+    angle = np.array(angle)
+    IDX_ABOVE = np.logical_or(angle > upper, angle == lower)
+    IDX_BELOW = np.logical_or(angle < lower, angle == upper)
+    angle[IDX_ABOVE] = lower + np.mod(
+        np.abs(angle[IDX_ABOVE] + upper),
+        np.abs(lower) + np.abs(upper),
+    )
+    angle[IDX_BELOW] = upper - np.mod(
+        np.abs(angle[IDX_BELOW] - lower),
+        np.abs(lower) + np.abs(upper),
+    )
+    return angle
+
+
 def load_kemar_hrtfs(npz_filename='kemar_hrtfs/hrtfs.npz'):
     """
     Helper function to load KEMAR HRTFs from Gardner & Martin (1994).
@@ -314,6 +334,11 @@ def impulse_generate_hrtf(
         np.sum(np.square(s_locations_relh), axis=1))
     s_locations_pol[:, 1] = np.rad2deg(
         np.angle(s_locations_relh[:, 0] - 1j * s_locations_relh[:, 1])) - head_azim
+    s_locations_pol[:, 1] = normalize_angle(
+        s_locations_pol[:, 1],
+        lower=-180,
+        upper=180,
+    ) # Bugfix to ensure angles outside 0° to 180° get `flipped` (msaddler, 2025/01)
     s_locations_pol[:, 2] = np.rad2deg(
         np.arcsin(s_locations_relh[:, 2] / s_locations_pol[:, 0]))
     if use_hrtf_symmetry:
@@ -687,7 +712,6 @@ def get_brir(
         src_dist * np.sin(np.deg2rad(src_elev)) + head_pos_xyz[2],
     ])
     if strict:
-        assert head_azim <= 135, "head_azim > 135° causes unexpected behavior (recommended range: [0, 90])"
         assert is_valid_position(head_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid head position"
         assert is_valid_position(src_pos_xyz, room_dim_xyz, buffer=buffer), "Invalid source position"
     if verbose:

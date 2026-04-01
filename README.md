@@ -10,15 +10,17 @@ This virtual acoustic room simulator uses the [Image-Source Method](https://www.
 - The Python interface for calling the MATLAB implementation (`simulator_matlab.py`) requires the [MATLAB Engine API for Python](https://www.mathworks.com/help/matlab/matlab-engine-for-python.html)
 
 
-### Example usage
+### Conventions
 
-Conventions:
-- `room_dim_xyz` specifies the `[X, Y, Z]` dimensions of a shoebox room with one corner at the origin `[0, 0, 0]`.
+- The `room_dim_xyz` argument specifies the `[X, Y, Z]` dimensions of a room with one corner at the origin.
 - The `x-y` plane with `z=0` corresponds to the room's floor and `z=Z` corresponds to the room's ceiling.
-- The `room_materials` argument is an ordered list of 6 integers corresponding to 4 walls, a floor, and a ceiling (`[x=0 wall, x=X wall, y=0 wall, y=Y wall, z=0 floor, z=Z ceiling]`). The integers correspond to different materials defined in [materials_original.csv](materials_original.csv).
+- The `room_materials` argument is an ordered list of 6 integers corresponding to 4 walls, a floor, and a ceiling: `[x=0 wall, x=X wall, y=0 wall, y=Y wall, z=0 floor, z=Z ceiling]`. The integers correspond to materials defined in [`materials_original.csv`](materials_original.csv).
 - 0 degrees azimuth is defined as parallel to a vector along the x-axis: `[1, 0, 0]`.
-- **Positive azimuths indicate counter-clockwise rotation away from the x-axis in the `x-y` plane**. Note this azimuth convention is opposite to that used by Gardner & Martin to label the KEMAR HRTFs. The `simulator.get_brir` function handles the mismatch between azimuth conventions internally. When using the function, a source azimuth of +90 degrees indicates a source to the listener's left and -90 degrees indicates a source to the listener's right.
-- Positive elevations indicate upward rotation from the floor (`z=0` plane). This convention is consistent with the Gardner & Martin's KEMAR HRTFs.
+- **Positive azimuths indicate counter-clockwise rotation away from the x-axis in the `x-y` plane**. Note this azimuth convention is opposite to that used by Gardner & Martin to label the KEMAR HRTFs. The `simulator.get_brir` function handles this mismatch internally. When using the function, a source azimuth of +90 degrees is to the listener's left and -90 degrees is to the listener's right.
+- Positive elevations indicate upward rotation away from the floor (`z=0` plane).
+
+
+### Example usage
 
 ```
 import simulator
@@ -68,8 +70,9 @@ print(brir.shape)  # --> [22050 timesteps, 2 channels = left and right ear]
     |__ shapedfilter_hrtf.m
     |__ vary_stim_env_hrir_sweep.m (script for generating set of BRIRs by Andrew Francl)
 
-|__ generate_brir_manifest.py (code for generating BRIRs in Saddler & McDermott, 2024 Nature Communications)
-|__ generate_brir_dataset.py (code for generating BRIRs in Saddler & McDermott, 2024 Nature Communications)
+|__ generate_brir_manifest.py
+|__ generate_brir_dataset.py      (code for Saddler & McDermott, 2024 Nature Communications)
+|__ generate_brir_dataset_job.sh
 ```
 
 

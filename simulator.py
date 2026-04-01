@@ -834,7 +834,7 @@ def get_brir(
         h_out, lead_zeros = room_impulse_hrtf(
             src_loc=src_pos_xyz,
             head_cent=head_pos_xyz,
-            head_azim=-head_azim,  # convention is positive azimuth = clockwise
+            head_azim=-head_azim,  # KEMAR HRTFs use the opposite azimuth convention
             walls=room_dim_xyz,
             wtypes=room_materials,
             sr=sr,
